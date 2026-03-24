@@ -8,6 +8,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from './config';
+import { createUserProfile, upsertUserProfile } from './firestore';
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -18,11 +19,19 @@ export async function signIn(email: string, password: string) {
 export async function signUp(email: string, password: string, displayName: string) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(cred.user, { displayName });
+  await createUserProfile(cred.user.uid, email, displayName);
   return cred;
 }
 
 export async function signInWithGoogle() {
-  return signInWithPopup(auth, googleProvider);
+  const cred = await signInWithPopup(auth, googleProvider);
+  const { uid, email, displayName, photoURL } = cred.user;
+  await upsertUserProfile(uid, {
+    email: email ?? '',
+    displayName: displayName ?? '',
+    photoURL: photoURL ?? '',
+  });
+  return cred;
 }
 
 export async function resetPassword(email: string) {

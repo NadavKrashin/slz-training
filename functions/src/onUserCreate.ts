@@ -1,17 +1,17 @@
-import { beforeUserCreated } from 'firebase-functions/v2/identity';
-import { admin, db } from './firebase';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { admin } from './firebase';
 
-export const onUserCreate = beforeUserCreated(async (event) => {
-  const user = event.data;
-  if (!user) return;
+export const onUserCreate = onDocumentCreated('users/{uid}', async (event) => {
+  const data = event.data?.data();
+  if (!data || data.role) return;
 
-  await db.collection('users').doc(user.uid).set({
-    uid: user.uid,
-    email: user.email || '',
-    displayName: user.displayName || user.email?.split('@')[0] || '',
-    shareCompletionWithAdmin: false,
-    role: 'user',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  await event.data?.ref.set(
+    {
+      shareCompletionWithAdmin: false,
+      role: 'user',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
 });

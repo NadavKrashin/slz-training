@@ -6,6 +6,29 @@ import {
 import { db } from './config';
 import type { UserProfile, Workout, WorkoutCompletion, AppSettings, MotivationalMessage } from '../types';
 
+export async function createUserProfile(uid: string, email: string, displayName: string): Promise<void> {
+  await setDoc(doc(db, 'users', uid), {
+    uid, email, displayName,
+    role: 'user',
+    shareCompletionWithAdmin: false,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function upsertUserProfile(uid: string, data: { email: string; displayName: string; photoURL?: string }): Promise<void> {
+  const ref = doc(db, 'users', uid);
+  const snap = await getDoc(ref);
+  await setDoc(ref, {
+    uid,
+    ...data,
+    role: snap.exists() ? (snap.data().role ?? 'user') : 'user',
+    shareCompletionWithAdmin: snap.data()?.shareCompletionWithAdmin ?? false,
+    updatedAt: serverTimestamp(),
+    ...(snap.exists() ? {} : { createdAt: serverTimestamp() }),
+  }, { merge: true });
+}
+
 export function subscribeToUser(uid: string, callback: (user: UserProfile | null) => void): Unsubscribe {
   return onSnapshot(doc(db, 'users', uid), (snap) => {
     callback(snap.exists() ? ({ ...snap.data(), uid: snap.id } as UserProfile) : null);

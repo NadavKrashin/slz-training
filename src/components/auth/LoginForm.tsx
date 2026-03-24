@@ -9,10 +9,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
-  const { signIn } = useAuth();
+  const { signIn, signInAsGuest } = useAuth();
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   const form = useForm({
     initialValues: { email: '', password: '' },
@@ -38,6 +39,21 @@ export function LoginForm() {
         <PasswordInput label="סיסמה" placeholder="הכנס סיסמה" {...form.getInputProps('password')} />
         <Button type="submit" fullWidth loading={loading} size="md">התחברות</Button>
         <GoogleSignInButton />
+        <Button
+          variant="light"
+          color="gray"
+          fullWidth
+          size="md"
+          loading={guestLoading}
+          onClick={async () => {
+            setGuestLoading(true);
+            try { await signInAsGuest(); router.push('/home'); }
+            catch { setError('כניסה כאורח נכשלה'); }
+            finally { setGuestLoading(false); }
+          }}
+        >
+          כניסה כאורח
+        </Button>
         <Text size="sm" ta="center">אין לך חשבון? <Anchor href="/register" fw={600}>הרשמה</Anchor></Text>
         <Text size="sm" ta="center"><Anchor href="/forgot-password">שכחתי סיסמה</Anchor></Text>
       </Stack>

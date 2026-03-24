@@ -16,13 +16,28 @@ export async function createUserProfile(uid: string, email: string, displayName:
   });
 }
 
+export async function createGuestProfile(uid: string): Promise<void> {
+  await setDoc(doc(db, 'users', uid), {
+    uid,
+    email: '',
+    displayName: 'אורח',
+    role: 'guest',
+    shareCompletionWithAdmin: false,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function upsertUserProfile(uid: string, data: { email: string; displayName: string; photoURL?: string }): Promise<void> {
   const ref = doc(db, 'users', uid);
   const snap = await getDoc(ref);
+  const existingRole = snap.exists() ? (snap.data().role ?? 'user') : 'user';
+  // Upgrade guest to user when linking account
+  const role = existingRole === 'guest' ? 'user' : existingRole;
   await setDoc(ref, {
     uid,
     ...data,
-    role: snap.exists() ? (snap.data().role ?? 'user') : 'user',
+    role,
     shareCompletionWithAdmin: snap.data()?.shareCompletionWithAdmin ?? false,
     updatedAt: serverTimestamp(),
     ...(snap.exists() ? {} : { createdAt: serverTimestamp() }),

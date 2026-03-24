@@ -40,7 +40,7 @@ export function UsersList() {
             <UnstyledButton key={u.uid} component="tr" onClick={() => router.push(`/admin/users/${u.uid}`)} style={{ cursor: 'pointer' }}>
               <Table.Td><Text fw={500}>{u.displayName}</Text></Table.Td>
               <Table.Td><Text size="sm" c="dimmed">{u.email}</Text></Table.Td>
-              <Table.Td><Badge variant="light" color={u.role === 'admin' ? 'brand' : 'gray'}>{u.role === 'admin' ? 'מנהל' : 'משתמש'}</Badge></Table.Td>
+              <Table.Td><Badge variant="light" color={u.role === 'admin' ? 'brand' : u.role === 'guest' ? 'yellow' : 'gray'}>{u.role === 'admin' ? 'מנהל' : u.role === 'guest' ? 'אורח' : 'משתמש'}</Badge></Table.Td>
               <Table.Td>
                 <Group gap={4}>
                   <Badge variant="dot" color={u.shareCompletionWithAdmin ? 'green' : 'gray'}>

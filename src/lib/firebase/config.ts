@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,11 +14,19 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = getAuth(app);
 
-// Use persistent cache (offline support) — replaces deprecated enableIndexedDbPersistence
-export const db = typeof window !== 'undefined'
-  ? initializeFirestore(app, {
+function createFirestore() {
+  if (getApps().length > 1 || typeof window === 'undefined') {
+    return getFirestore(app);
+  }
+  try {
+    return initializeFirestore(app, {
       localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-    })
-  : initializeFirestore(app, {});
+    });
+  } catch {
+    return getFirestore(app);
+  }
+}
+
+export const db = createFirestore();
 
 export default app;

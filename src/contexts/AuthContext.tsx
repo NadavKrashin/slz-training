@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
 import { signIn, signUp, signInWithGoogle, resetPassword, signOut, updateDisplayName } from '@/lib/firebase/auth';
-import { syncFcmToken } from '@/lib/firebase/messaging';
+import { requestNotificationPermission, syncFcmToken } from '@/lib/firebase/messaging';
 
 interface AuthContextValue {
   user: User | null;
@@ -32,8 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (firebaseUser) {
         const tokenResult = await firebaseUser.getIdTokenResult();
         setIsAdmin(tokenResult.claims.admin === true);
-        // Silently refresh FCM token on each login in case Firebase rotated it
-        syncFcmToken(firebaseUser.uid);
+        // Request permission on first login; sync token if already granted
+        if (typeof window !== 'undefined') {
+          if (Notification.permission === 'default') {
+            requestNotificationPermission(firebaseUser.uid);
+          } else {
+            syncFcmToken(firebaseUser.uid);
+          }
+        }
       } else { setIsAdmin(false); }
       setLoading(false);
     });

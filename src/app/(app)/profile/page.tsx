@@ -15,6 +15,9 @@ export default function ProfilePage() {
   const { currentStreak } = useStreak();
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' ? Notification.permission : 'default'
+  );
 
   const handleUpdateName = async () => {
     if (!name.trim()) return;
@@ -40,8 +43,9 @@ export default function ProfilePage() {
 
   const handleNotifications = async () => {
     if (!user) return;
-    const token = await requestNotificationPermission(user.uid);
-    if (token) {
+    const granted = await requestNotificationPermission(user.uid);
+    setNotifPermission(Notification.permission);
+    if (granted) {
       notifications.show({ title: 'הופעלו', message: 'התראות הופעלו בהצלחה', color: 'green' });
     } else {
       notifications.show({ title: 'נכשל', message: 'לא ניתן להפעיל התראות', color: 'red' });
@@ -86,7 +90,9 @@ export default function ProfilePage() {
           </Stack>
         </Card>
 
-        <Button variant="outline" onClick={handleNotifications}>הפעל התראות</Button>
+        {notifPermission !== 'granted' && (
+          <Button variant="outline" onClick={handleNotifications}>הפעל התראות</Button>
+        )}
         <Button variant="light" color="red" onClick={signOut}>התנתק</Button>
       </Stack>
     </PageContainer>

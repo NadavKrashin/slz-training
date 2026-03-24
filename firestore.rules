@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuth() && request.auth.token.admin == true;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // Users
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if false; // Only created by Cloud Function onUserCreate
+      allow update: if isOwner(uid) &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['displayName', 'shareCompletionWithAdmin', 'fcmToken', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    // Workouts by date
+    match /workoutsByDate/{dateKey} {
+      allow read: if isAuth();
+      allow create, update: if isAdmin() &&
+        request.resource.data.totalDurationSeconds == 600;
+      allow delete: if isAdmin();
+    }
+
+    // Workout completions
+    match /workoutCompletions/{docId} {
+      allow read: if isAuth() && (
+        resource.data.uid == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuth() &&
+        request.resource.data.uid == request.auth.uid;
+      allow update: if isAuth() &&
+        resource.data.uid == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['completedAt', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    // App settings
+    match /appSettings/{docId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Motivational messages
+    match /motivationalMessages/{msgId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}

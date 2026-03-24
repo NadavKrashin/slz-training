@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Stack, TextInput, Table, Badge, Text, UnstyledButton, Group } from '@mantine/core';
+import { Stack, TextInput, Table, Badge, Text, UnstyledButton, Group, Switch } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { getAllUsers } from '@/lib/firebase/firestore';
@@ -11,21 +11,29 @@ export function UsersList() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showGuests, setShowGuests] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     getAllUsers().then((u) => { setUsers(u); setLoading(false); });
   }, []);
 
+  const guestCount = users.filter((u) => u.role === 'guest').length;
   const filtered = users.filter(
-    (u) => u.displayName.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()),
+    (u) => (showGuests || u.role !== 'guest') &&
+      (u.displayName.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())),
   );
 
   if (loading) return <Text c="dimmed">טוען משתמשים...</Text>;
 
   return (
     <Stack gap="md">
-      <TextInput placeholder="חיפוש לפי שם או אימייל" leftSection={<IconSearch size={16} />} value={search} onChange={(e) => setSearch(e.currentTarget.value)} />
+      <Group justify="space-between">
+        <TextInput placeholder="חיפוש לפי שם או אימייל" leftSection={<IconSearch size={16} />} value={search} onChange={(e) => setSearch(e.currentTarget.value)} style={{ flex: 1 }} />
+        {guestCount > 0 && (
+          <Switch label={`הצג אורחים (${guestCount})`} checked={showGuests} onChange={(e) => setShowGuests(e.currentTarget.checked)} />
+        )}
+      </Group>
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>

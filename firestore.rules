@@ -22,7 +22,9 @@ service cloud.firestore {
         request.resource.data.role in ['user', 'guest'];
       allow update: if isOwner(uid) &&
         request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['displayName', 'email', 'shareCompletionWithAdmin', 'fcmToken', 'role', 'photoURL', 'updatedAt']);
+          .hasOnly(['displayName', 'email', 'shareCompletionWithAdmin', 'fcmToken', 'role', 'photoURL', 'updatedAt']) &&
+        // Prevent users from self-promoting to admin via direct Firestore writes
+        request.resource.data.role in ['user', 'guest'];
       allow delete: if false;
     }
 

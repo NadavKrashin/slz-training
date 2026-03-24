@@ -119,6 +119,13 @@ export default function ProfilePage() {
 
       <Container size="sm" px="md" pt="lg">
         <Stack gap="md">
+          <Card>
+            <Group justify="center" gap="xs">
+              <Text size="sm">רצף אימונים:</Text>
+              <Text size="lg" fw={700} c="orange.6">🔥 {currentStreak} ימים</Text>
+            </Group>
+          </Card>
+
           {isGuest ? (
             /* Guest upgrade section */
             <>
@@ -145,13 +152,6 @@ export default function ProfilePage() {
           ) : (
             /* Regular user profile */
             <>
-              <Card>
-                <Group justify="center" gap="xs">
-                  <Text size="sm">רצף אימונים:</Text>
-                  <Text size="lg" fw={700} c="orange.6">🔥 {currentStreak} ימים</Text>
-                </Group>
-              </Card>
-
               <Card>
                 <Stack gap="sm">
                   <Text fw={500} c="brand.7">עדכון שם תצוגה</Text>

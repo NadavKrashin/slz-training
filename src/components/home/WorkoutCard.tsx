@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Stack, Group, Text, Button, Badge, Divider, ThemeIcon } from '@mantine/core';
+import { Card, Stack, Group, Text, Button, Badge, Divider, ThemeIcon, Box } from '@mantine/core';
 import { IconCheck, IconPlayerPlay } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { formatSeconds } from '@/lib/dates';
@@ -13,27 +13,39 @@ export function WorkoutCard({ workout, isCompleted }: WorkoutCardProps) {
   const router = useRouter();
 
   return (
-    <Card>
-      <Stack gap="md">
-        <Group justify="space-between" align="flex-start">
-          <Stack gap={4}>
-            <Text size="xl" fw={700}>{workout.title}</Text>
-            {workout.description && <Text size="sm" c="dimmed">{workout.description}</Text>}
+    <Card p={0} style={{ overflow: 'hidden' }}>
+      <Box
+        px="lg"
+        py="md"
+        style={{
+          background: isCompleted
+            ? 'linear-gradient(135deg, #51cf66 0%, #40c057 100%)'
+            : 'linear-gradient(135deg, #4c6ef5 0%, #748ffc 100%)',
+        }}
+      >
+        <Group justify="space-between" align="center">
+          <Stack gap={2}>
+            <Text size="lg" fw={700} c="white">{workout.title}</Text>
+            {workout.description && <Text size="sm" c="rgba(255,255,255,0.8)">{workout.description}</Text>}
           </Stack>
           {isCompleted && (
-            <ThemeIcon size={40} radius="xl" color="green"><IconCheck size={24} /></ThemeIcon>
+            <ThemeIcon size={36} radius="xl" color="white" variant="filled" c="green.7">
+              <IconCheck size={22} />
+            </ThemeIcon>
           )}
         </Group>
+      </Box>
+      <Stack gap="md" p="lg">
         <Group gap="xs">
-          <Badge variant="light" color="brand">{workout.stages.length} שלבים</Badge>
-          <Badge variant="light" color="gray">{formatSeconds(workout.totalDurationSeconds)}</Badge>
+          <Badge variant="light" color="brand" size="md">{workout.stages.length} שלבים</Badge>
+          <Badge variant="light" color="gray" size="md">{formatSeconds(workout.totalDurationSeconds)}</Badge>
         </Group>
-        <Divider />
+        <Divider color="brand.1" />
         <StagesList stages={workout.stages} />
         <Button fullWidth size="lg"
           leftSection={isCompleted ? <IconCheck size={20} /> : <IconPlayerPlay size={20} />}
           color={isCompleted ? 'green' : 'brand'}
-          variant={isCompleted ? 'light' : 'filled'}
+          variant="filled"
           onClick={() => router.push('/workout')}>
           {isCompleted ? 'התחל שוב' : 'התחל אימון'}
         </Button>

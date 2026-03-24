@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Stack, Text, TextInput, Button, Switch, Card, Group, Divider } from '@mantine/core';
+import { Stack, Text, TextInput, Button, Switch, Card, Group, Box, Container, ThemeIcon } from '@mantine/core';
+import { IconUser } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import { PageContainer } from '@/components/layout/PageContainer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/hooks/useUser';
 import { useStreak } from '@/hooks/useStreak';
 import { requestNotificationPermission } from '@/lib/firebase/messaging';
+import { NAV_HEIGHT } from '@/lib/constants';
 
 export default function ProfilePage() {
   const { user, signOut, updateDisplayName, isAdmin } = useAuth();
@@ -53,48 +54,68 @@ export default function ProfilePage() {
   };
 
   return (
-    <PageContainer>
-      <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">פרופיל</Text>
+    <Box pb={NAV_HEIGHT + 24}>
+      {/* Compact profile header */}
+      <Box
+        style={{
+          background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
+          borderRadius: '0 0 24px 24px',
+        }}
+        px="md"
+        pt={36}
+        pb={28}
+      >
+        <Container size="sm">
+          <Group justify="center" gap="md">
+            <ThemeIcon size={48} radius="xl" color="white" variant="filled" c="brand.6">
+              <IconUser size={24} />
+            </ThemeIcon>
+            <Stack gap={0}>
+              <Text size="md" fw={700} c="white">{userData?.displayName}</Text>
+              <Text size="xs" c="rgba(255,255,255,0.7)">{userData?.email}</Text>
+            </Stack>
+            {isAdmin && (
+              <Box px="sm" py={2} style={{ borderRadius: 'var(--mantine-radius-xl)', background: 'rgba(255,255,255,0.2)' }}>
+                <Text size="xs" fw={600} c="white">מנהל</Text>
+              </Box>
+            )}
+          </Group>
+        </Container>
+      </Box>
 
-        <Card>
-          <Stack gap="sm">
-            <Text fw={500}>{userData?.displayName}</Text>
-            <Text size="sm" c="dimmed">{userData?.email}</Text>
-            {isAdmin && <Text size="sm" c="brand">מנהל</Text>}
-            <Divider />
-            <Group>
+      <Container size="sm" px="md" pt="lg">
+        <Stack gap="md">
+          <Card>
+            <Group justify="center" gap="xs">
               <Text size="sm">רצף אימונים:</Text>
-              <Text size="sm" fw={700}>{currentStreak} ימים 🔥</Text>
+              <Text size="lg" fw={700} c="orange.6">🔥 {currentStreak} ימים</Text>
             </Group>
-          </Stack>
-        </Card>
+          </Card>
 
-        <Card>
-          <Stack gap="sm">
-            <Text fw={500}>עדכון שם תצוגה</Text>
-            <Group>
-              <TextInput placeholder={userData?.displayName} value={name} onChange={(e) => setName(e.currentTarget.value)} style={{ flex: 1 }} />
-              <Button onClick={handleUpdateName} loading={saving} disabled={!name.trim()}>עדכן</Button>
-            </Group>
-          </Stack>
-        </Card>
+          <Card>
+            <Stack gap="sm">
+              <Text fw={500} c="brand.7">עדכון שם תצוגה</Text>
+              <Group>
+                <TextInput placeholder={userData?.displayName} value={name} onChange={(e) => setName(e.currentTarget.value)} style={{ flex: 1 }} />
+                <Button onClick={handleUpdateName} loading={saving} disabled={!name.trim()}>עדכן</Button>
+              </Group>
+            </Stack>
+          </Card>
 
-        <Card>
-          <Stack gap="sm">
+          <Card>
             <Switch
               label="שתף ביצוע אימונים עם המנהל"
               checked={userData?.shareCompletionWithAdmin ?? true}
               onChange={handleToggleShare}
             />
-          </Stack>
-        </Card>
+          </Card>
 
-        {notifPermission !== 'granted' && (
-          <Button variant="outline" onClick={handleNotifications}>הפעל התראות</Button>
-        )}
-        <Button variant="light" color="red" onClick={signOut}>התנתק</Button>
-      </Stack>
-    </PageContainer>
+          {notifPermission !== 'granted' && (
+            <Button variant="light" onClick={handleNotifications}>הפעל התראות</Button>
+          )}
+          <Button variant="subtle" color="red" onClick={signOut}>התנתק</Button>
+        </Stack>
+      </Container>
+    </Box>
   );
 }

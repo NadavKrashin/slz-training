@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <AdminNav />
-      <Box>{children}</Box>
+      <Box py="md" px="md" mih="calc(100dvh - 50px)">{children}</Box>
     </>
   );
 }

@@ -90,6 +90,44 @@ src/
 functions/       # Firebase Cloud Functions
 ```
 
+## Admin Permissions
+
+Admin authorization uses a two-layer system:
+
+### Firebase Custom Claims (source of truth)
+
+A JWT claim `{ admin: true }` is set on a user's auth token via the `setAdminClaim` Cloud Function. This is checked by:
+
+- **Client:** `getIdTokenResult().claims.admin` in `AuthContext` → sets `isAdmin`
+- **Firestore rules:** `request.auth.token.admin == true` in the `isAdmin()` helper
+
+The Firestore `users/{uid}.role` field is **display only** (used for badges in the admin user list) and has no authorization power.
+
+### Where it's enforced
+
+| Layer | How |
+|---|---|
+| Admin pages | `(admin)/layout.tsx` checks `isAdmin`, redirects to `/home` if false |
+| Admin nav tab | `BottomNav` only shows the gear icon when `isAdmin` is true |
+| Firestore writes | Rules check `request.auth.token.admin` for workout CRUD, app settings, messages |
+| Cloud Functions | `context.auth.token.admin` check in callable functions |
+
+### Making someone admin
+
+From the browser console while logged in as an existing admin:
+
+```js
+window.makeAdmin('target-user-uid')
+```
+
+To find a user's UID, run `window.whoAmI()` in their browser console.
+
+After the call succeeds, the target user must sign out and sign back in (or call `refreshClaims()`) to pick up the new claim.
+
+### Bootstrapping the first admin
+
+Since no admin exists initially to call `setAdminClaim`, you need to bootstrap manually. See the [Bootstrap admin](#6-bootstrap-admin) section in Setup.
+
 ## Key Features
 
 - Full Hebrew RTL interface

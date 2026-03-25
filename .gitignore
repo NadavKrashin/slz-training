@@ -22,6 +22,9 @@ firebase-debug.*.log
 firestore-debug.log
 ui-debug.log
 
+# build artifacts
+tsconfig.tsbuildinfo
+
 # misc
 .DS_Store
 *.pem

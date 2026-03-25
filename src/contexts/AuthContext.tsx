@@ -32,14 +32,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
         const isAnon = firebaseUser.isAnonymous;
         setIsGuest(isAnon);
-        const tokenResult = await firebaseUser.getIdTokenResult();
-        setIsAdmin(tokenResult.claims.admin === true);
-        // Skip notifications for guest users
+        // Resolve admin claims and notifications async — never block the loading state
+        firebaseUser.getIdTokenResult().then((tokenResult) => {
+          setIsAdmin(tokenResult.claims.admin === true);
+        });
         if (!isAnon && typeof window !== 'undefined') {
           if (Notification.permission === 'default') {
             requestNotificationPermission(firebaseUser.uid);
@@ -47,7 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             syncFcmToken(firebaseUser.uid);
           }
         }
-      } else { setIsAdmin(false); setIsGuest(false); }
+      } else {
+        setIsAdmin(false);
+        setIsGuest(false);
+      }
       setLoading(false);
     });
     return unsubscribe;

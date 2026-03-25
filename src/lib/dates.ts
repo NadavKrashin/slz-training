@@ -1,7 +1,8 @@
 import { APP_TIMEZONE } from './constants';
+import { currentDate } from './clock';
 
 export function getTodayDateKey(): string {
-  return formatDateKey(new Date());
+  return formatDateKey(currentDate());
 }
 
 export function formatDateKey(date: Date): string {
@@ -58,7 +59,7 @@ export function formatSeconds(seconds: number): string {
 }
 
 export function getMsUntilMidnight(): number {
-  const now = new Date();
+  const d = currentDate();
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: APP_TIMEZONE,
     year: 'numeric',
@@ -69,7 +70,7 @@ export function getMsUntilMidnight(): number {
     second: '2-digit',
     hour12: false,
   });
-  const parts = formatter.formatToParts(now);
+  const parts = formatter.formatToParts(d);
   const get = (type: string) => parts.find((p) => p.type === type)?.value || '0';
   const h = parseInt(get('hour'));
   const m = parseInt(get('minute'));

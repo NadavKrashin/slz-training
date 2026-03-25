@@ -3,6 +3,7 @@
 import { useReducer, useEffect, useRef, useCallback } from 'react';
 import type { WorkoutStage, WorkoutFlowStatus } from '@/lib/types';
 import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
+import { now } from '@/lib/clock';
 
 interface TimerState {
   status: WorkoutFlowStatus;
@@ -62,11 +63,11 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
   const startTicking = useCallback(() => {
     clearTimer();
     intervalRef.current = setInterval(() => {
-      const now = Date.now();
+      const t = now();
       const s = stateRef.current;
       const allStages = stagesRef.current;
-      const totalElapsed = totalElapsedOnPauseRef.current + (now - startTimeRef.current) / 1000;
-      const stageElapsed = stageElapsedOnPauseRef.current + (now - stageStartRef.current) / 1000;
+      const totalElapsed = totalElapsedOnPauseRef.current + (t - startTimeRef.current) / 1000;
+      const stageElapsed = stageElapsedOnPauseRef.current + (t - stageStartRef.current) / 1000;
       const totalRemaining = Math.max(0, WORKOUT_DURATION_SECONDS - totalElapsed);
 
       if (totalRemaining <= 0) { clearTimer(); dispatch({ type: 'COMPLETE' }); onCompleteRef.current(); return; }
@@ -79,7 +80,7 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
       if (stageRemaining <= 0) {
         const nextIndex = s.currentStageIndex + 1;
         if (nextIndex >= allStages.length) { clearTimer(); dispatch({ type: 'COMPLETE' }); onCompleteRef.current(); return; }
-        stageStartRef.current = now;
+        stageStartRef.current = t;
         stageElapsedOnPauseRef.current = 0;
         dispatch({ type: 'TICK', stageRemaining: allStages[nextIndex].durationSeconds, totalRemaining: Math.ceil(totalRemaining), nextStage: true });
       } else {
@@ -89,29 +90,35 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
   }, [clearTimer]);
 
   const start = useCallback(() => {
-    const now = Date.now();
-    startTimeRef.current = now; stageStartRef.current = now;
+    const t = now();
+    startTimeRef.current = t; stageStartRef.current = t;
     totalElapsedOnPauseRef.current = 0; stageElapsedOnPauseRef.current = 0;
     dispatch({ type: 'START' }); startTicking();
   }, [startTicking]);
 
   const pause = useCallback(() => {
-    const now = Date.now();
-    totalElapsedOnPauseRef.current += (now - startTimeRef.current) / 1000;
-    stageElapsedOnPauseRef.current += (now - stageStartRef.current) / 1000;
+    const t = now();
+    totalElapsedOnPauseRef.current += (t - startTimeRef.current) / 1000;
+    stageElapsedOnPauseRef.current += (t - stageStartRef.current) / 1000;
     clearTimer(); dispatch({ type: 'PAUSE' });
   }, [clearTimer]);
 
   const resume = useCallback(() => {
-    const now = Date.now();
-    startTimeRef.current = now; stageStartRef.current = now;
+    const t = now();
+    startTimeRef.current = t; stageStartRef.current = t;
     dispatch({ type: 'RESUME' }); startTicking();
   }, [startTicking]);
+
+  const forceComplete = useCallback(() => {
+    clearTimer();
+    dispatch({ type: 'COMPLETE' });
+    onCompleteRef.current();
+  }, [clearTimer]);
 
   useEffect(() => { return clearTimer; }, [clearTimer]);
 
   const currentStage = stages[state.currentStageIndex] || null;
   const progress = stages.length > 0 ? ((state.currentStageIndex) / stages.length) * 100 : 0;
 
-  return { ...state, currentStage, progress, start, pause, resume };
+  return { ...state, currentStage, progress, start, pause, resume, forceComplete };
 }

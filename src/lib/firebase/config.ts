@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -28,5 +28,16 @@ function createFirestore() {
 }
 
 export const db = createFirestore();
+
+// Connect to Firebase emulators in development
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
+  try {
+    connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+    connectFirestoreEmulator(db, 'localhost', 8080);
+    console.log('[Firebase] Connected to emulators');
+  } catch {
+    // Already connected (hot reload)
+  }
+}
 
 export default app;

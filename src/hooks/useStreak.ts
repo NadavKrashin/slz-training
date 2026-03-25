@@ -12,7 +12,12 @@ export function useStreak() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setCurrentStreak(0); setTotalCompletions(0); setLoading(false); return; }
+    if (!user) {
+      setCurrentStreak(0);
+      setTotalCompletions(0);
+      setLoading(false);
+      return;
+    }
 
     async function calculate() {
       const today = getTodayDateKey();
@@ -34,8 +39,11 @@ export function useStreak() {
       for (let i = 0; i < 90; i++) {
         const dk = formatDateKey(cursor);
         if (workoutDates.has(dk)) {
-          if (completedSet.has(dk)) { streak++; }
-          else { break; }
+          if (completedSet.has(dk)) {
+            streak++;
+          } else {
+            break;
+          }
         }
         cursor.setDate(cursor.getDate() - 1);
       }

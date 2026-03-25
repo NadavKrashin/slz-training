@@ -30,7 +30,9 @@ export default function WorkoutsPage() {
     setLoading(false);
   };
 
-  useEffect(() => { loadWorkouts(); }, []);
+  useEffect(() => {
+    loadWorkouts();
+  }, []);
 
   const todayKey = getTodayDateKey();
 
@@ -50,25 +52,57 @@ export default function WorkoutsPage() {
     <PageContainer>
       <Stack gap="lg">
         <Group justify="space-between">
-          <Text size="xl" fw={700}>אימונים</Text>
-          <Button leftSection={<IconPlus size={16} />} onClick={() => router.push(`/admin/workouts/${todayKey}`)}>אימון חדש</Button>
+          <Text size="xl" fw={700}>
+            אימונים
+          </Text>
+          <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={() => router.push(`/admin/workouts/${todayKey}`)}
+          >
+            אימון חדש
+          </Button>
         </Group>
         {loading && <Text c="dimmed">טוען...</Text>}
-        {!loading && workouts.length === 0 && <Text c="dimmed" ta="center">אין אימונים</Text>}
+        {!loading && workouts.length === 0 && (
+          <Text c="dimmed" ta="center">
+            אין אימונים
+          </Text>
+        )}
         {workouts.map((w) => (
           <Card key={w.dateKey} padding="md" withBorder>
             <Group justify="space-between">
               <Stack gap={4}>
                 <Group gap="xs">
                   <Text fw={500}>{w.title}</Text>
-                  {w.dateKey === todayKey && <Badge size="sm" color="green">היום</Badge>}
+                  {w.dateKey === todayKey && (
+                    <Badge size="sm" color="green">
+                      היום
+                    </Badge>
+                  )}
                 </Group>
-                <Text size="sm" c="dimmed">{getHebrewDate(dateKeyToDate(w.dateKey))}</Text>
-                <Text size="xs" c="dimmed">{w.stages.length} תחנות</Text>
+                <Text size="sm" c="dimmed">
+                  {getHebrewDate(dateKeyToDate(w.dateKey))}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {w.stages.length} תחנות
+                </Text>
               </Stack>
               <Group gap="xs">
-                <ActionIcon variant="subtle" aria-label="ערוך אימון" onClick={() => router.push(`/admin/workouts/${w.dateKey}`)}><IconEdit size={16} /></ActionIcon>
-                <ActionIcon variant="subtle" color="red" aria-label="מחק אימון" onClick={() => setDeleteTarget(w.dateKey)}><IconTrash size={16} /></ActionIcon>
+                <ActionIcon
+                  variant="subtle"
+                  aria-label="ערוך אימון"
+                  onClick={() => router.push(`/admin/workouts/${w.dateKey}`)}
+                >
+                  <IconEdit size={16} />
+                </ActionIcon>
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  aria-label="מחק אימון"
+                  onClick={() => setDeleteTarget(w.dateKey)}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon>
               </Group>
             </Group>
           </Card>

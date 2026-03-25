@@ -19,7 +19,9 @@ export function MessagesList() {
     setLoading(false);
   };
 
-  useEffect(() => { loadMessages(); }, []);
+  useEffect(() => {
+    loadMessages();
+  }, []);
 
   const handleAdd = async () => {
     if (!newText.trim()) return;
@@ -31,7 +33,9 @@ export function MessagesList() {
       notifications.show({ title: 'נוסף', message: 'ההודעה נוספה', color: 'green' });
     } catch {
       notifications.show({ title: 'שגיאה', message: 'ההוספה נכשלה', color: 'red' });
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleToggle = async (msg: MotivationalMessage) => {
@@ -58,21 +62,47 @@ export function MessagesList() {
   return (
     <Stack gap="md">
       <Group>
-        <TextInput placeholder="הודעה מוטיבציונית חדשה..." value={newText} onChange={(e) => setNewText(e.currentTarget.value)} style={{ flex: 1 }} onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
-        <Button leftSection={<IconPlus size={16} />} onClick={handleAdd} loading={saving}>הוסף</Button>
+        <TextInput
+          placeholder="הודעה מוטיבציונית חדשה..."
+          value={newText}
+          onChange={(e) => setNewText(e.currentTarget.value)}
+          style={{ flex: 1 }}
+          onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+        />
+        <Button leftSection={<IconPlus size={16} />} onClick={handleAdd} loading={saving}>
+          הוסף
+        </Button>
       </Group>
       {messages.map((msg) => (
         <Card key={msg.id} padding="sm" withBorder>
           <Group justify="space-between" wrap="nowrap">
-            <Text size="sm" style={{ flex: 1 }}>{msg.text}</Text>
+            <Text size="sm" style={{ flex: 1 }}>
+              {msg.text}
+            </Text>
             <Group gap="xs" wrap="nowrap">
-              <Switch checked={msg.active} onChange={() => handleToggle(msg)} label={msg.active ? 'פעיל' : 'כבוי'} size="sm" />
-              <ActionIcon variant="subtle" color="red" aria-label="מחק הודעה" onClick={() => handleDelete(msg.id)}><IconTrash size={16} /></ActionIcon>
+              <Switch
+                checked={msg.active}
+                onChange={() => handleToggle(msg)}
+                label={msg.active ? 'פעיל' : 'כבוי'}
+                size="sm"
+              />
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                aria-label="מחק הודעה"
+                onClick={() => handleDelete(msg.id)}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
             </Group>
           </Group>
         </Card>
       ))}
-      {messages.length === 0 && <Text c="dimmed" ta="center">אין הודעות</Text>}
+      {messages.length === 0 && (
+        <Text c="dimmed" ta="center">
+          אין הודעות
+        </Text>
+      )}
     </Stack>
   );
 }

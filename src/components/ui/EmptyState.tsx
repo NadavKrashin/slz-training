@@ -26,9 +26,13 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
               <IconMoodSad size={30} />
             </ThemeIcon>
           )}
-          <Text size="lg" fw={600} ta="center" c="brand.8">{title}</Text>
+          <Text size="lg" fw={600} ta="center" c="brand.8">
+            {title}
+          </Text>
           {description && (
-            <Text size="sm" c="brand.5" ta="center" maw={300}>{description}</Text>
+            <Text size="sm" c="brand.5" ta="center" maw={300}>
+              {description}
+            </Text>
           )}
         </Stack>
       </Box>

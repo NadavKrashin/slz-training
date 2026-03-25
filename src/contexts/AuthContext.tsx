@@ -3,7 +3,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
-import { signIn, signUp, signInWithGoogle, signInAsGuest, linkGuestToEmail, linkGuestToGoogle, resetPassword, signOut, updateDisplayName } from '@/lib/firebase/auth';
+import {
+  signIn,
+  signUp,
+  signInWithGoogle,
+  signInAsGuest,
+  linkGuestToEmail,
+  linkGuestToGoogle,
+  resetPassword,
+  signOut,
+  updateDisplayName,
+} from '@/lib/firebase/auth';
 import { requestNotificationPermission, syncFcmToken } from '@/lib/firebase/messaging';
 
 interface AuthContextValue {
@@ -65,16 +75,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value: AuthContextValue = {
-    user, loading, isAdmin, isGuest,
-    signIn: async (email, password) => { await signIn(email, password); },
-    signUp: async (email, password, displayName) => { await signUp(email, password, displayName); },
-    signInWithGoogle: async () => { await signInWithGoogle(); },
-    signInAsGuest: async () => { await signInAsGuest(); },
-    linkGuestToEmail: async (email, password, displayName) => { await linkGuestToEmail(email, password, displayName); },
-    linkGuestToGoogle: async () => { await linkGuestToGoogle(); },
-    resetPassword: async (email) => { await resetPassword(email); },
-    signOut: async () => { await signOut(); },
-    updateDisplayName: async (name) => { await updateDisplayName(name); },
+    user,
+    loading,
+    isAdmin,
+    isGuest,
+    signIn: async (email, password) => {
+      await signIn(email, password);
+    },
+    signUp: async (email, password, displayName) => {
+      await signUp(email, password, displayName);
+    },
+    signInWithGoogle: async () => {
+      await signInWithGoogle();
+    },
+    signInAsGuest: async () => {
+      await signInAsGuest();
+    },
+    linkGuestToEmail: async (email, password, displayName) => {
+      await linkGuestToEmail(email, password, displayName);
+    },
+    linkGuestToGoogle: async () => {
+      await linkGuestToGoogle();
+    },
+    resetPassword: async (email) => {
+      await resetPassword(email);
+    },
+    signOut: async () => {
+      await signOut();
+    },
+    updateDisplayName: async (name) => {
+      await updateDisplayName(name);
+    },
     refreshClaims,
   };
 

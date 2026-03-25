@@ -12,7 +12,14 @@ interface TimerDisplayProps {
   inverted?: boolean;
 }
 
-export function TimerDisplay({ remaining, total, label, color = 'brand', size = 'lg', inverted = false }: TimerDisplayProps) {
+export function TimerDisplay({
+  remaining,
+  total,
+  label,
+  color = 'brand',
+  size = 'lg',
+  inverted = false,
+}: TimerDisplayProps) {
   const progress = total > 0 ? ((total - remaining) / total) * 100 : 0;
   const ringSize = size === 'lg' ? 180 : 120;
   const thickness = size === 'lg' ? 14 : 10;
@@ -40,7 +47,9 @@ export function TimerDisplay({ remaining, total, label, color = 'brand', size = 
           </Center>
         }
       />
-      <Text size="sm" c={inverted ? 'rgba(255,255,255,0.7)' : 'dimmed'} fw={500}>{label}</Text>
+      <Text size="sm" c={inverted ? 'rgba(255,255,255,0.7)' : 'dimmed'} fw={500}>
+        {label}
+      </Text>
     </Stack>
   );
 }

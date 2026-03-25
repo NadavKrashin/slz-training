@@ -7,7 +7,10 @@ import { formatSeconds } from '@/lib/dates';
 import { StagesList } from './StagesList';
 import type { Workout } from '@/lib/types';
 
-interface WorkoutCardProps { workout: Workout; isCompleted: boolean; }
+interface WorkoutCardProps {
+  workout: Workout;
+  isCompleted: boolean;
+}
 
 export function WorkoutCard({ workout, isCompleted }: WorkoutCardProps) {
   const router = useRouter();
@@ -25,8 +28,14 @@ export function WorkoutCard({ workout, isCompleted }: WorkoutCardProps) {
       >
         <Group justify="space-between" align="center">
           <Stack gap={2}>
-            <Text size="lg" fw={700} c="white">{workout.title}</Text>
-            {workout.description && <Text size="sm" c="rgba(255,255,255,0.8)">{workout.description}</Text>}
+            <Text size="lg" fw={700} c="white">
+              {workout.title}
+            </Text>
+            {workout.description && (
+              <Text size="sm" c="rgba(255,255,255,0.8)">
+                {workout.description}
+              </Text>
+            )}
           </Stack>
           {isCompleted && (
             <ThemeIcon size={36} radius="xl" color="white" variant="filled" c="green.7">
@@ -37,16 +46,23 @@ export function WorkoutCard({ workout, isCompleted }: WorkoutCardProps) {
       </Box>
       <Stack gap="md" p="lg">
         <Group gap="xs">
-          <Badge variant="light" color="brand" size="md">{workout.stages.length} שלבים</Badge>
-          <Badge variant="light" color="gray" size="md">{formatSeconds(workout.totalDurationSeconds)}</Badge>
+          <Badge variant="light" color="brand" size="md">
+            {workout.stages.length} שלבים
+          </Badge>
+          <Badge variant="light" color="gray" size="md">
+            {formatSeconds(workout.totalDurationSeconds)}
+          </Badge>
         </Group>
         <Divider color="brand.1" />
         <StagesList stages={workout.stages} />
-        <Button fullWidth size="lg"
+        <Button
+          fullWidth
+          size="lg"
           leftSection={isCompleted ? <IconCheck size={20} /> : <IconPlayerPlay size={20} />}
           color={isCompleted ? 'green' : 'brand'}
           variant="filled"
-          onClick={() => router.push('/workout')}>
+          onClick={() => router.push('/workout')}
+        >
           {isCompleted ? 'התחל שוב' : 'התחל אימון'}
         </Button>
       </Stack>

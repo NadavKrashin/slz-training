@@ -70,11 +70,25 @@ export function WorkoutForm({ dateKey, onSaved, duplicateFrom }: WorkoutFormProp
 
   return (
     <Stack gap="lg">
-      <TextInput label="כותרת האימון" placeholder="למשל: אימון כוח עליון" value={title} onChange={(e) => setTitle(e.currentTarget.value)} required />
-      <Textarea label="תיאור (אופציונלי)" placeholder="הסבר קצר על האימון" value={description} onChange={(e) => setDescription(e.currentTarget.value)} rows={2} />
+      <TextInput
+        label="כותרת האימון"
+        placeholder="למשל: אימון כוח עליון"
+        value={title}
+        onChange={(e) => setTitle(e.currentTarget.value)}
+        required
+      />
+      <Textarea
+        label="תיאור (אופציונלי)"
+        placeholder="הסבר קצר על האימון"
+        value={description}
+        onChange={(e) => setDescription(e.currentTarget.value)}
+        rows={2}
+      />
       <StageEditor stages={stages} onChange={setStages} />
       <Group justify="flex-end">
-        <Button onClick={handleSubmit} loading={loading} disabled={!isValid}>שמור אימון</Button>
+        <Button onClick={handleSubmit} loading={loading} disabled={!isValid}>
+          שמור אימון
+        </Button>
       </Group>
     </Stack>
   );

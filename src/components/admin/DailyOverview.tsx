@@ -15,16 +15,14 @@ export function DailyOverview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      getCompletionsForDate(dateKey),
-      getAllUsers(),
-      getWorkout(dateKey),
-    ]).then(([c, u, w]) => {
-      setCompletions(c);
-      setUsers(u);
-      setWorkout(w);
-      setLoading(false);
-    });
+    Promise.all([getCompletionsForDate(dateKey), getAllUsers(), getWorkout(dateKey)]).then(
+      ([c, u, w]) => {
+        setCompletions(c);
+        setUsers(u);
+        setWorkout(w);
+        setLoading(false);
+      }
+    );
   }, [dateKey]);
 
   if (loading) return <Text c="dimmed">טוען...</Text>;
@@ -39,24 +37,42 @@ export function DailyOverview() {
         <Text fw={600}>{getHebrewDate(new Date())}</Text>
         {workout && <Badge variant="light">{workout.title}</Badge>}
       </Group>
-      {!workout && <Card><Text c="dimmed" ta="center">אין אימון מוגדר להיום</Text></Card>}
+      {!workout && (
+        <Card>
+          <Text c="dimmed" ta="center">
+            אין אימון מוגדר להיום
+          </Text>
+        </Card>
+      )}
       <Group>
         <Card style={{ flex: 1 }}>
           <Stack align="center" gap={4}>
-            <Text size="xl" fw={700} c="green">{completedCount}</Text>
-            <Text size="xs" c="dimmed">השלימו</Text>
+            <Text size="xl" fw={700} c="green">
+              {completedCount}
+            </Text>
+            <Text size="xs" c="dimmed">
+              השלימו
+            </Text>
           </Stack>
         </Card>
         <Card style={{ flex: 1 }}>
           <Stack align="center" gap={4}>
-            <Text size="xl" fw={700} c="red">{sharingUsers.length - completedCount}</Text>
-            <Text size="xs" c="dimmed">טרם השלימו</Text>
+            <Text size="xl" fw={700} c="red">
+              {sharingUsers.length - completedCount}
+            </Text>
+            <Text size="xs" c="dimmed">
+              טרם השלימו
+            </Text>
           </Stack>
         </Card>
         <Card style={{ flex: 1 }}>
           <Stack align="center" gap={4}>
-            <Text size="xl" fw={700}>{sharingUsers.length}</Text>
-            <Text size="xs" c="dimmed">סה״כ משתפים</Text>
+            <Text size="xl" fw={700}>
+              {sharingUsers.length}
+            </Text>
+            <Text size="xs" c="dimmed">
+              סה״כ משתפים
+            </Text>
           </Stack>
         </Card>
       </Group>
@@ -75,7 +91,12 @@ export function DailyOverview() {
                 <Table.Tr key={u.uid}>
                   <Table.Td>{u.displayName}</Table.Td>
                   <Table.Td>
-                    <ThemeIcon size="sm" variant="light" color={done ? 'green' : 'gray'} radius="xl">
+                    <ThemeIcon
+                      size="sm"
+                      variant="light"
+                      color={done ? 'green' : 'gray'}
+                      radius="xl"
+                    >
                       {done ? <IconCheck size={12} /> : <IconX size={12} />}
                     </ThemeIcon>
                   </Table.Td>

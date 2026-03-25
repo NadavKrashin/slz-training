@@ -11,7 +11,11 @@ export function useCompletions(startDate: string, endDate: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setCompletions(new Map()); setLoading(false); return; }
+    if (!user) {
+      setCompletions(new Map());
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     getCompletionsForUser(user.uid, startDate, endDate).then((data) => {
       const map = new Map<string, WorkoutCompletion>();
@@ -29,7 +33,11 @@ export function useCompletionsForUid(uid: string, startDate: string, endDate: st
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!uid) { setCompletions(new Map()); setLoading(false); return; }
+    if (!uid) {
+      setCompletions(new Map());
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     getCompletionsForUser(uid, startDate, endDate).then((data) => {
       const map = new Map<string, WorkoutCompletion>();

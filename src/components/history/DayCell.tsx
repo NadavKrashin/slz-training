@@ -4,7 +4,15 @@ import { Center, Text } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import type { DayStatus } from '@/lib/types';
 
-export function DayCell({ day, status, isToday }: { day: number; status: DayStatus; isToday: boolean }) {
+export function DayCell({
+  day,
+  status,
+  isToday,
+}: {
+  day: number;
+  status: DayStatus;
+  isToday: boolean;
+}) {
   const bgColor = {
     completed: 'var(--mantine-color-brand-1)',
     missed: 'var(--mantine-color-red-0)',
@@ -15,7 +23,8 @@ export function DayCell({ day, status, isToday }: { day: number; status: DayStat
 
   return (
     <Center
-      w={40} h={40}
+      w={40}
+      h={40}
       style={{
         borderRadius: 'var(--mantine-radius-xl)',
         backgroundColor: bgColor,
@@ -24,9 +33,27 @@ export function DayCell({ day, status, isToday }: { day: number; status: DayStat
         boxShadow: isToday ? '0 0 0 2px rgba(76, 110, 245, 0.2)' : undefined,
       }}
     >
-      <Text size="sm" fw={isToday ? 700 : 400} c={status === 'future' ? 'gray.4' : status === 'completed' ? 'brand.8' : undefined}>{day}</Text>
-      {status === 'completed' && <IconCheck size={12} color="var(--mantine-color-brand-7)" style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)' }} />}
-      {status === 'missed' && <IconX size={12} color="var(--mantine-color-red-6)" style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)' }} />}
+      <Text
+        size="sm"
+        fw={isToday ? 700 : 400}
+        c={status === 'future' ? 'gray.4' : status === 'completed' ? 'brand.8' : undefined}
+      >
+        {day}
+      </Text>
+      {status === 'completed' && (
+        <IconCheck
+          size={12}
+          color="var(--mantine-color-brand-7)"
+          style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)' }}
+        />
+      )}
+      {status === 'missed' && (
+        <IconX
+          size={12}
+          color="var(--mantine-color-red-6)"
+          style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)' }}
+        />
+      )}
     </Center>
   );
 }

@@ -11,8 +11,15 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setUserData(null); setLoading(false); return; }
-    const unsub = subscribeToUser(user.uid, (data) => { setUserData(data); setLoading(false); });
+    if (!user) {
+      setUserData(null);
+      setLoading(false);
+      return;
+    }
+    const unsub = subscribeToUser(user.uid, (data) => {
+      setUserData(data);
+      setLoading(false);
+    });
     return unsub;
   }, [user]);
 

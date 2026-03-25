@@ -14,15 +14,28 @@ export function GoogleSignInButton({ onClick }: { onClick?: () => Promise<void> 
   const handleClick = async () => {
     setLoading(true);
     try {
-      if (onClick) { await onClick(); }
-      else { await signInWithGoogle(); router.push('/home'); }
+      if (onClick) {
+        await onClick();
+      } else {
+        await signInWithGoogle();
+        router.push('/home');
+      }
+    } catch {
+      /* cancelled */
+    } finally {
+      setLoading(false);
     }
-    catch { /* cancelled */ }
-    finally { setLoading(false); }
   };
 
   return (
-    <Button variant="default" fullWidth size="md" leftSection={<IconBrandGoogle size={20} />} onClick={handleClick} loading={loading}>
+    <Button
+      variant="default"
+      fullWidth
+      size="md"
+      leftSection={<IconBrandGoogle size={20} />}
+      onClick={handleClick}
+      loading={loading}
+    >
       התחברות עם Google
     </Button>
   );

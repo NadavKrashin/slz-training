@@ -2,7 +2,14 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { Box, Group, UnstyledButton, Text, ScrollArea } from '@mantine/core';
-import { IconBarbell, IconUsers, IconCalendarEvent, IconMessage, IconClock, IconChevronRight } from '@tabler/icons-react';
+import {
+  IconBarbell,
+  IconUsers,
+  IconCalendarEvent,
+  IconMessage,
+  IconClock,
+  IconChevronRight,
+} from '@tabler/icons-react';
 
 const ADMIN_ITEMS = [
   { label: 'אימונים', icon: IconBarbell, path: '/admin/workouts' },
@@ -19,7 +26,10 @@ export function AdminNav() {
   return (
     <Box
       style={{
-        borderRadius: 0, position: 'sticky', top: 0, zIndex: 100,
+        borderRadius: 0,
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
         background: 'linear-gradient(135deg, #4c6ef5 0%, #5c7cfa 100%)',
         boxShadow: '0 2px 12px rgba(76, 110, 245, 0.2)',
       }}
@@ -27,7 +37,12 @@ export function AdminNav() {
       <ScrollArea type="never">
         <Group gap={0} wrap="nowrap" px="xs" h={50}>
           <UnstyledButton onClick={() => router.push('/home')} px="sm">
-            <Group gap={4}><IconChevronRight size={16} color="white" /><Text size="sm" fw={600} c="white">חזרה</Text></Group>
+            <Group gap={4}>
+              <IconChevronRight size={16} color="white" />
+              <Text size="sm" fw={600} c="white">
+                חזרה
+              </Text>
+            </Group>
           </UnstyledButton>
           {ADMIN_ITEMS.map((item) => {
             const isActive = pathname.startsWith(item.path);
@@ -45,7 +60,14 @@ export function AdminNav() {
               >
                 <Group gap={6} wrap="nowrap">
                   <item.icon size={18} color="white" />
-                  <Text size="sm" fw={isActive ? 700 : 400} c="white" style={{ whiteSpace: 'nowrap' }}>{item.label}</Text>
+                  <Text
+                    size="sm"
+                    fw={isActive ? 700 : 400}
+                    c="white"
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    {item.label}
+                  </Text>
                 </Group>
               </UnstyledButton>
             );

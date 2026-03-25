@@ -11,15 +11,25 @@ export function useWorkoutCompletion(dateKey: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setCompletion(null); setLoading(false); return; }
-    const unsub = subscribeToCompletion(user.uid, dateKey, (data) => { setCompletion(data); setLoading(false); });
+    if (!user) {
+      setCompletion(null);
+      setLoading(false);
+      return;
+    }
+    const unsub = subscribeToCompletion(user.uid, dateKey, (data) => {
+      setCompletion(data);
+      setLoading(false);
+    });
     return unsub;
   }, [user, dateKey]);
 
-  const markComplete = useCallback(async (workoutTitle: string) => {
-    if (!user) return;
-    await markWorkoutComplete(user.uid, dateKey, workoutTitle);
-  }, [user, dateKey]);
+  const markComplete = useCallback(
+    async (workoutTitle: string) => {
+      if (!user) return;
+      await markWorkoutComplete(user.uid, dateKey, workoutTitle);
+    },
+    [user, dateKey]
+  );
 
   const isCompleted = completion?.completed === true;
   return { completion, isCompleted, loading, markComplete };

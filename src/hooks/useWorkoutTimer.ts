@@ -30,15 +30,23 @@ function createInitialState(stages: WorkoutStage[]): TimerState {
 
 function timerReducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
-    case 'START': return { ...state, status: 'running' };
-    case 'TICK': return {
-      ...state, stageRemaining: action.stageRemaining, totalRemaining: action.totalRemaining,
-      currentStageIndex: action.nextStage ? state.currentStageIndex + 1 : state.currentStageIndex,
-    };
-    case 'PAUSE': return { ...state, status: 'paused' };
-    case 'RESUME': return { ...state, status: 'running' };
-    case 'COMPLETE': return { ...state, status: 'completed', totalRemaining: 0, stageRemaining: 0 };
-    default: return state;
+    case 'START':
+      return { ...state, status: 'running' };
+    case 'TICK':
+      return {
+        ...state,
+        stageRemaining: action.stageRemaining,
+        totalRemaining: action.totalRemaining,
+        currentStageIndex: action.nextStage ? state.currentStageIndex + 1 : state.currentStageIndex,
+      };
+    case 'PAUSE':
+      return { ...state, status: 'paused' };
+    case 'RESUME':
+      return { ...state, status: 'running' };
+    case 'COMPLETE':
+      return { ...state, status: 'completed', totalRemaining: 0, stageRemaining: 0 };
+    default:
+      return state;
   }
 }
 
@@ -57,7 +65,10 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
   stateRef.current = state;
 
   const clearTimer = useCallback(() => {
-    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   }, []);
 
   const startTicking = useCallback(() => {
@@ -70,43 +81,74 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
       const stageElapsed = stageElapsedOnPauseRef.current + (t - stageStartRef.current) / 1000;
       const totalRemaining = Math.max(0, WORKOUT_DURATION_SECONDS - totalElapsed);
 
-      if (totalRemaining <= 0) { clearTimer(); dispatch({ type: 'COMPLETE' }); onCompleteRef.current(); return; }
+      if (totalRemaining <= 0) {
+        clearTimer();
+        dispatch({ type: 'COMPLETE' });
+        onCompleteRef.current();
+        return;
+      }
 
       const currentStage = allStages[s.currentStageIndex];
-      if (!currentStage) { clearTimer(); dispatch({ type: 'COMPLETE' }); onCompleteRef.current(); return; }
+      if (!currentStage) {
+        clearTimer();
+        dispatch({ type: 'COMPLETE' });
+        onCompleteRef.current();
+        return;
+      }
 
       const stageRemaining = Math.max(0, currentStage.durationSeconds - stageElapsed);
 
       if (stageRemaining <= 0) {
         const nextIndex = s.currentStageIndex + 1;
-        if (nextIndex >= allStages.length) { clearTimer(); dispatch({ type: 'COMPLETE' }); onCompleteRef.current(); return; }
+        if (nextIndex >= allStages.length) {
+          clearTimer();
+          dispatch({ type: 'COMPLETE' });
+          onCompleteRef.current();
+          return;
+        }
         stageStartRef.current = t;
         stageElapsedOnPauseRef.current = 0;
-        dispatch({ type: 'TICK', stageRemaining: allStages[nextIndex].durationSeconds, totalRemaining: Math.ceil(totalRemaining), nextStage: true });
+        dispatch({
+          type: 'TICK',
+          stageRemaining: allStages[nextIndex].durationSeconds,
+          totalRemaining: Math.ceil(totalRemaining),
+          nextStage: true,
+        });
       } else {
-        dispatch({ type: 'TICK', stageRemaining: Math.ceil(stageRemaining), totalRemaining: Math.ceil(totalRemaining), nextStage: false });
+        dispatch({
+          type: 'TICK',
+          stageRemaining: Math.ceil(stageRemaining),
+          totalRemaining: Math.ceil(totalRemaining),
+          nextStage: false,
+        });
       }
     }, 200);
   }, [clearTimer]);
 
   const start = useCallback(() => {
     const t = now();
-    startTimeRef.current = t; stageStartRef.current = t;
-    totalElapsedOnPauseRef.current = 0; stageElapsedOnPauseRef.current = 0;
-    dispatch({ type: 'START' }); startTicking();
+    startTimeRef.current = t;
+    stageStartRef.current = t;
+    totalElapsedOnPauseRef.current = 0;
+    stageElapsedOnPauseRef.current = 0;
+    dispatch({ type: 'START' });
+    startTicking();
   }, [startTicking]);
 
   const pause = useCallback(() => {
     const t = now();
     totalElapsedOnPauseRef.current += (t - startTimeRef.current) / 1000;
     stageElapsedOnPauseRef.current += (t - stageStartRef.current) / 1000;
-    clearTimer(); dispatch({ type: 'PAUSE' });
+    clearTimer();
+    dispatch({ type: 'PAUSE' });
   }, [clearTimer]);
 
   const resume = useCallback(() => {
     const t = now();
-    startTimeRef.current = t; stageStartRef.current = t;
-    dispatch({ type: 'RESUME' }); startTicking();
+    startTimeRef.current = t;
+    stageStartRef.current = t;
+    dispatch({ type: 'RESUME' });
+    startTicking();
   }, [startTicking]);
 
   const forceComplete = useCallback(() => {
@@ -115,10 +157,12 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
     onCompleteRef.current();
   }, [clearTimer]);
 
-  useEffect(() => { return clearTimer; }, [clearTimer]);
+  useEffect(() => {
+    return clearTimer;
+  }, [clearTimer]);
 
   const currentStage = stages[state.currentStageIndex] || null;
-  const progress = stages.length > 0 ? ((state.currentStageIndex) / stages.length) * 100 : 0;
+  const progress = stages.length > 0 ? (state.currentStageIndex / stages.length) * 100 : 0;
 
   return { ...state, currentStage, progress, start, pause, resume, forceComplete };
 }

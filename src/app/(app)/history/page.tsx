@@ -49,8 +49,15 @@ export default function HistoryPage() {
       >
         <Container size="sm">
           <Stack gap="md">
-            <Text size="lg" fw={700} c="white" ta="center">היסטוריה</Text>
-            <MonthNavigator label={getHebrewMonthYear(currentMonth)} onPrev={goPrev} onNext={goNext} canGoNext={canGoNext} />
+            <Text size="lg" fw={700} c="white" ta="center">
+              היסטוריה
+            </Text>
+            <MonthNavigator
+              label={getHebrewMonthYear(currentMonth)}
+              onPrev={goPrev}
+              onNext={goNext}
+              canGoNext={canGoNext}
+            />
           </Stack>
         </Container>
       </Box>
@@ -58,11 +65,23 @@ export default function HistoryPage() {
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
           {loading ? (
-            <Text c="dimmed" ta="center">טוען...</Text>
+            <Text c="dimmed" ta="center">
+              טוען...
+            </Text>
           ) : (
             <>
-              <CalendarGrid year={year} month={month} completions={completions} workoutDates={workoutDates} />
-              <MonthlySummary completed={completed} missed={total - completed} total={total} streak={currentStreak} />
+              <CalendarGrid
+                year={year}
+                month={month}
+                completions={completions}
+                workoutDates={workoutDates}
+              />
+              <MonthlySummary
+                completed={completed}
+                missed={total - completed}
+                total={total}
+                streak={currentStreak}
+              />
             </>
           )}
         </Stack>

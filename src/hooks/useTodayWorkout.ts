@@ -12,13 +12,18 @@ export function useTodayWorkout() {
 
   useEffect(() => {
     const ms = getMsUntilMidnight();
-    const timeout = setTimeout(() => { setDateKey(getTodayDateKey()); }, ms + 1000);
+    const timeout = setTimeout(() => {
+      setDateKey(getTodayDateKey());
+    }, ms + 1000);
     return () => clearTimeout(timeout);
   }, [dateKey]);
 
   useEffect(() => {
     setLoading(true);
-    const unsub = subscribeToWorkout(dateKey, (data) => { setWorkout(data); setLoading(false); });
+    const unsub = subscribeToWorkout(dateKey, (data) => {
+      setWorkout(data);
+      setLoading(false);
+    });
     return unsub;
   }, [dateKey]);
 

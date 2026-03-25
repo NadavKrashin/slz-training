@@ -8,7 +8,9 @@ export default function DailyPage() {
   return (
     <PageContainer>
       <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">סקירה יומית</Text>
+        <Text size="xl" fw={700} ta="center">
+          סקירה יומית
+        </Text>
         <DailyOverview />
       </Stack>
     </PageContainer>

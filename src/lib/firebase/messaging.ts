@@ -6,7 +6,9 @@ let messaging: ReturnType<typeof getMessaging> | null = null;
 
 function getMessagingInstance() {
   if (typeof window === 'undefined') return null;
-  if (!messaging) { messaging = getMessaging(app); }
+  if (!messaging) {
+    messaging = getMessaging(app);
+  }
   return messaging;
 }
 
@@ -20,7 +22,9 @@ export async function requestNotificationPermission(uid: string): Promise<boolea
     if (!token) return false;
     await updateUser(uid, { fcmToken: token });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -36,7 +40,9 @@ export async function syncFcmToken(uid: string): Promise<void> {
     if (!msg) return;
     const token = await getToken(msg, { vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY });
     if (token) await updateUser(uid, { fcmToken: token });
-  } catch { /* silently ignore — not critical */ }
+  } catch {
+    /* silently ignore — not critical */
+  }
 }
 
 export function onForegroundMessage(callback: (payload: any) => void) {

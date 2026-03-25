@@ -20,16 +20,25 @@ export function ForgotPasswordForm() {
   const handleSubmit = form.onSubmit(async (values) => {
     setError('');
     setLoading(true);
-    try { await resetPassword(values.email); setSuccess(true); }
-    catch { setError('שגיאה בשליחת מייל איפוס'); }
-    finally { setLoading(false); }
+    try {
+      await resetPassword(values.email);
+      setSuccess(true);
+    } catch {
+      setError('שגיאה בשליחת מייל איפוס');
+    } finally {
+      setLoading(false);
+    }
   });
 
   if (success) {
     return (
       <Stack gap="md" align="center">
-        <Alert icon={<IconCheck size={16} />} color="green" variant="light">נשלח מייל איפוס סיסמה! בדוק את תיבת הדואר שלך.</Alert>
-        <Anchor href="/login" fw={600}>חזרה להתחברות</Anchor>
+        <Alert icon={<IconCheck size={16} />} color="green" variant="light">
+          נשלח מייל איפוס סיסמה! בדוק את תיבת הדואר שלך.
+        </Alert>
+        <Anchor href="/login" fw={600}>
+          חזרה להתחברות
+        </Anchor>
       </Stack>
     );
   }
@@ -37,11 +46,26 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="md">
-        {error && <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">{error}</Alert>}
-        <Text size="sm" c="dimmed">הכנס את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה.</Text>
-        <TextInput label="אימייל" placeholder="your@email.com" type="email" {...form.getInputProps('email')} />
-        <Button type="submit" fullWidth loading={loading} size="md">שלח קישור איפוס</Button>
-        <Text size="sm" ta="center"><Anchor href="/login">חזרה להתחברות</Anchor></Text>
+        {error && (
+          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+            {error}
+          </Alert>
+        )}
+        <Text size="sm" c="dimmed">
+          הכנס את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה.
+        </Text>
+        <TextInput
+          label="אימייל"
+          placeholder="your@email.com"
+          type="email"
+          {...form.getInputProps('email')}
+        />
+        <Button type="submit" fullWidth loading={loading} size="md">
+          שלח קישור איפוס
+        </Button>
+        <Text size="sm" ta="center">
+          <Anchor href="/login">חזרה להתחברות</Anchor>
+        </Text>
       </Stack>
     </form>
   );

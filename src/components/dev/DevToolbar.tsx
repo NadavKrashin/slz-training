@@ -1,9 +1,24 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Paper, Stack, Group, Text, Button, SegmentedControl, ActionIcon, Box } from '@mantine/core';
+import {
+  Paper,
+  Stack,
+  Group,
+  Text,
+  Button,
+  SegmentedControl,
+  ActionIcon,
+  Box,
+} from '@mantine/core';
 import { IconBug, IconX, IconPlayerPlay, IconClock } from '@tabler/icons-react';
-import { setTimeScale, setClockOffset, resetClock, getTimeScale, getClockOffset } from '@/lib/clock';
+import {
+  setTimeScale,
+  setClockOffset,
+  resetClock,
+  getTimeScale,
+  getClockOffset,
+} from '@/lib/clock';
 
 const SPEED_OPTIONS = [
   { label: '1x', value: '1' },
@@ -51,7 +66,10 @@ export function DevToolbar() {
     const now = new Date();
     const istFormatter = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Jerusalem',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
     });
     const parts = istFormatter.formatToParts(now);
     const get = (type: string) => parseInt(parts.find((p) => p.type === type)?.value || '0');
@@ -63,7 +81,10 @@ export function DevToolbar() {
 
   const triggerReminder = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:5001/demo-slz-training/us-central1/sendDailyReminder', { method: 'GET' });
+      const res = await fetch(
+        'http://localhost:5001/demo-slz-training/us-central1/sendDailyReminder',
+        { method: 'GET' }
+      );
       if (res.ok) alert('Reminder triggered');
       else alert(`Failed: ${res.status}`);
     } catch {
@@ -108,7 +129,9 @@ export function DevToolbar() {
         <Group justify="space-between">
           <Group gap="xs">
             <IconBug size={16} color="orange" />
-            <Text size="sm" fw={700} c="orange">Dev Tools</Text>
+            <Text size="sm" fw={700} c="orange">
+              Dev Tools
+            </Text>
           </Group>
           <ActionIcon variant="subtle" c="gray.5" onClick={() => setOpen(false)} size="sm">
             <IconX size={14} />
@@ -119,7 +142,12 @@ export function DevToolbar() {
         <Box>
           <Text size="xs" c="gray.4" mb={4}>
             <IconPlayerPlay size={12} style={{ verticalAlign: 'middle' }} /> Timer Speed
-            {speed !== '1' && <Text span c="orange" fw={700}> ({speed}x active)</Text>}
+            {speed !== '1' && (
+              <Text span c="orange" fw={700}>
+                {' '}
+                ({speed}x active)
+              </Text>
+            )}
           </Text>
           <SegmentedControl
             data={SPEED_OPTIONS}
@@ -136,23 +164,50 @@ export function DevToolbar() {
         <Box>
           <Text size="xs" c="gray.4" mb={4}>
             <IconClock size={12} style={{ verticalAlign: 'middle' }} /> Clock Offset
-            {offsetHours !== 0 && <Text span c="orange" fw={700}> ({offsetHours > 0 ? '+' : ''}{offsetHours.toFixed(1)}h)</Text>}
+            {offsetHours !== 0 && (
+              <Text span c="orange" fw={700}>
+                {' '}
+                ({offsetHours > 0 ? '+' : ''}
+                {offsetHours.toFixed(1)}h)
+              </Text>
+            )}
           </Text>
           <Group gap="xs">
-            <Button size="xs" variant="light" color="gray" onClick={() => handleOffsetChange(offsetHours - 1)}>-1h</Button>
-            <Button size="xs" variant="light" color="gray" onClick={() => handleOffsetChange(offsetHours + 1)}>+1h</Button>
-            <Button size="xs" variant="light" color="yellow" onClick={handleSimulateMidnight}>→ 23:59:50</Button>
+            <Button
+              size="xs"
+              variant="light"
+              color="gray"
+              onClick={() => handleOffsetChange(offsetHours - 1)}
+            >
+              -1h
+            </Button>
+            <Button
+              size="xs"
+              variant="light"
+              color="gray"
+              onClick={() => handleOffsetChange(offsetHours + 1)}
+            >
+              +1h
+            </Button>
+            <Button size="xs" variant="light" color="yellow" onClick={handleSimulateMidnight}>
+              → 23:59:50
+            </Button>
           </Group>
         </Box>
 
         {/* Quick Actions */}
         <Group gap="xs">
-          <Button size="xs" variant="light" color="red" onClick={handleReset}>Reset All</Button>
-          <Button size="xs" variant="light" color="blue" onClick={triggerReminder}>Trigger Reminder</Button>
+          <Button size="xs" variant="light" color="red" onClick={handleReset}>
+            Reset All
+          </Button>
+          <Button size="xs" variant="light" color="blue" onClick={triggerReminder}>
+            Trigger Reminder
+          </Button>
         </Group>
 
         <Text size="xs" c="gray.6" ta="center">
-          {getTimeScale()}x speed | offset: {(getClockOffset() / 3600000).toFixed(1)}h | Ctrl+Shift+D to toggle
+          {getTimeScale()}x speed | offset: {(getClockOffset() / 3600000).toFixed(1)}h |
+          Ctrl+Shift+D to toggle
         </Text>
       </Stack>
     </Paper>

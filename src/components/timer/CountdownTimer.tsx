@@ -9,7 +9,9 @@ function TimeUnit({ value, label }: { value: number; label: string }) {
         w={72}
         h={80}
         style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           borderRadius: 'var(--mantine-radius-lg)',
           background: 'rgba(255,255,255,0.15)',
           backdropFilter: 'blur(8px)',
@@ -19,18 +21,32 @@ function TimeUnit({ value, label }: { value: number; label: string }) {
           {String(value).padStart(2, '0')}
         </Text>
       </Box>
-      <Text size="xs" fw={500} c="rgba(255,255,255,0.7)">{label}</Text>
+      <Text size="xs" fw={500} c="rgba(255,255,255,0.7)">
+        {label}
+      </Text>
     </Stack>
   );
 }
 
 function Separator() {
   return (
-    <Text size="2rem" fw={700} c="rgba(255,255,255,0.5)" pt={8}>:</Text>
+    <Text size="2rem" fw={700} c="rgba(255,255,255,0.5)" pt={8}>
+      :
+    </Text>
   );
 }
 
-export function CountdownTimer({ days, hours, minutes, seconds }: { days: number; hours: number; minutes: number; seconds: number }) {
+export function CountdownTimer({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) {
   return (
     <Group justify="center" gap="sm">
       <TimeUnit value={days} label="ימים" />

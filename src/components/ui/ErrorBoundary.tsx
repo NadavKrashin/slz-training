@@ -33,7 +33,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <Stack align="center" justify="center" style={{ minHeight: '60vh' }} p="xl">
-          <Title order={3} ta="center">משהו השתבש</Title>
+          <Title order={3} ta="center">
+            משהו השתבש
+          </Title>
           <Text c="dimmed" ta="center" size="sm">
             אירעה שגיאה בלתי צפויה. אפשר לנסות לרענן את הדף.
           </Text>

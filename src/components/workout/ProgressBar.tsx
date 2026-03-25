@@ -2,7 +2,15 @@
 
 import { Progress, Text, Stack } from '@mantine/core';
 
-export function ProgressBar({ currentStage, totalStages, inverted = false }: { currentStage: number; totalStages: number; inverted?: boolean }) {
+export function ProgressBar({
+  currentStage,
+  totalStages,
+  inverted = false,
+}: {
+  currentStage: number;
+  totalStages: number;
+  inverted?: boolean;
+}) {
   const value = totalStages > 0 ? (currentStage / totalStages) * 100 : 0;
   return (
     <Stack gap={4}>

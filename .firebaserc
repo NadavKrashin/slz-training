@@ -2,6 +2,6 @@
   "projects": {
     "default": "slz-training",
     "production": "slz-training",
-    "staging": "slz-training-staging"
+    "dev": "slz-training-dev"
   }
 }

@@ -43,5 +43,5 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
 
-      - name: Deploy to Firebase Staging
-        run: npx firebase-tools deploy --project staging --non-interactive
+      - name: Deploy to Firebase Dev
+        run: npx firebase-tools deploy --project dev --non-interactive

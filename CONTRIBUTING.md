@@ -54,7 +54,7 @@ Fill in `.env.local` with real Firebase values. Set `NEXT_PUBLIC_USE_EMULATORS=f
 
 ```
 main          →  Production  (slz-training)
-develop       →  Staging     (slz-training-staging)
+develop       →  Dev/Staging (slz-training-dev)
 feature/*     →  Local only  (no deployment)
 fix/*         →  Local only
 ```
@@ -115,8 +115,8 @@ To set up approval (recommended):
 ### Manual deploy (emergency)
 
 ```bash
-# Staging
-firebase deploy --project staging
+# Dev/staging
+firebase deploy --project dev
 
 # Production
 firebase deploy --project production
@@ -129,7 +129,7 @@ firebase deploy --project production
 ### 1. Create the staging Firebase project
 
 ```bash
-firebase projects:create slz-training-staging
+firebase projects:create slz-training-dev
 ```
 
 Then configure it in the Firebase Console: enable Auth (Google + Email/Password), Firestore, Functions, and Cloud Messaging.
@@ -164,7 +164,7 @@ Add the following secrets:
 | `FIREBASE_SERVICE_ACCOUNT_PRODUCTION` | Full JSON content of production service account key |
 | `STAGING_FIREBASE_API_KEY` | From staging Firebase Console → Project settings → Your apps |
 | `STAGING_FIREBASE_AUTH_DOMAIN` | |
-| `STAGING_FIREBASE_PROJECT_ID` | `slz-training-staging` |
+| `STAGING_FIREBASE_PROJECT_ID` | `slz-training-dev` |
 | `STAGING_FIREBASE_STORAGE_BUCKET` | |
 | `STAGING_FIREBASE_MESSAGING_SENDER_ID` | |
 | `STAGING_FIREBASE_APP_ID` | |

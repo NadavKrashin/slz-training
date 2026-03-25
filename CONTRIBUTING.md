@@ -80,6 +80,18 @@ git push -u origin feature/my-feature
 
 ---
 
+## Code style
+
+Prettier is configured in `.prettierrc`. Format before committing:
+
+```bash
+npm run format        # reformat src/
+npm run format:check  # check only (runs in CI)
+npm run lint          # ESLint
+```
+
+---
+
 ## CI
 
 GitHub Actions runs on every push to `develop`/`main` and every PR targeting those branches.
@@ -187,6 +199,10 @@ Add Required reviewers to `production` for the approval gate.
 ---
 
 ## Notes
+
+### Notification logs
+
+After every 22:00 scheduled reminder, a document is written to `notificationLogs/{dateKey}` in Firestore with `successCount`, `failureCount`, `targetedCount`, `staleTokensCleaned`, and a `skippedReason` if the reminder was skipped (no workout, no tokens, or everyone already completed). Check this collection to verify a reminder ran without needing to watch Cloud Function logs.
 
 ### Static hosting
 

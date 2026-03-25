@@ -10,8 +10,8 @@
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
-    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
-    "seed": "tsx scripts/seed-emulator.ts",
+    "emulators": "firebase emulators:start --project demo-slz-training --import=./emulator-data --export-on-exit=./emulator-data",
+    "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 tsx scripts/seed-emulator.ts",
     "emulators:export": "firebase emulators:export ./emulator-data"
   },
   "dependencies": {

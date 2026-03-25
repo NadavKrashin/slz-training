@@ -1,23 +1,26 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { logger } from 'firebase-functions/v2';
 import { admin, db } from './firebase';
-
-function getTodayDateKeyIST(): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Jerusalem',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-}
+import { getTodayDateKeyIST } from './shared/dates';
 
 export const sendDailyReminder = onSchedule(
   { schedule: '0 22 * * *', timeZone: 'Asia/Jerusalem' },
   async () => {
     const todayKey = getTodayDateKeyIST();
+    const logRef = db.collection('notificationLogs').doc(todayKey);
 
     const workoutDoc = await db.collection('workoutsByDate').doc(todayKey).get();
     if (!workoutDoc.exists) {
-      console.log(`No workout for ${todayKey}, skipping reminder`);
+      logger.info('No workout scheduled, skipping reminder', { dateKey: todayKey });
+      await logRef.set({
+        dateKey: todayKey,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        skippedReason: 'no_workout',
+        targetedCount: 0,
+        successCount: 0,
+        failureCount: 0,
+        staleTokensCleaned: 0,
+      });
       return;
     }
 
@@ -27,7 +30,16 @@ export const sendDailyReminder = onSchedule(
       .get();
 
     if (usersSnapshot.empty) {
-      console.log('No users with FCM tokens');
+      logger.info('No users with FCM tokens, skipping reminder', { dateKey: todayKey });
+      await logRef.set({
+        dateKey: todayKey,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        skippedReason: 'no_tokens',
+        targetedCount: 0,
+        successCount: 0,
+        failureCount: 0,
+        staleTokensCleaned: 0,
+      });
       return;
     }
 
@@ -50,7 +62,16 @@ export const sendDailyReminder = onSchedule(
     });
 
     if (tokens.length === 0) {
-      console.log('All users with tokens have completed today');
+      logger.info('All users with tokens have already completed today', { dateKey: todayKey });
+      await logRef.set({
+        dateKey: todayKey,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        skippedReason: 'all_completed',
+        targetedCount: 0,
+        successCount: 0,
+        failureCount: 0,
+        staleTokensCleaned: 0,
+      });
       return;
     }
 
@@ -64,9 +85,12 @@ export const sendDailyReminder = onSchedule(
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-    console.log(
-      `Sent ${response.successCount} notifications, ${response.failureCount} failed`
-    );
+    logger.info('Daily reminder sent', {
+      dateKey: todayKey,
+      targetedCount: tokens.length,
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+    });
 
     // Remove permanently-invalid tokens so they don't accumulate
     const staleTokenCleanups: Promise<void>[] = [];
@@ -93,7 +117,19 @@ export const sendDailyReminder = onSchedule(
 
     if (staleTokenCleanups.length > 0) {
       await Promise.all(staleTokenCleanups);
-      console.log(`Cleaned up ${staleTokenCleanups.length} stale FCM tokens`);
+      logger.info('Cleaned up stale FCM tokens', {
+        dateKey: todayKey,
+        count: staleTokenCleanups.length,
+      });
     }
+
+    await logRef.set({
+      dateKey: todayKey,
+      sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      targetedCount: tokens.length,
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+      staleTokensCleaned: staleTokenCleanups.length,
+    });
   }
 );

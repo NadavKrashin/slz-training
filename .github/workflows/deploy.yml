@@ -41,6 +41,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Write functions env
+        run: echo "BOOTSTRAP_ADMIN_EMAIL=${{ secrets.BOOTSTRAP_ADMIN_EMAIL }}" > functions/.env.${{ secrets.FIREBASE_PROJECT_ID }}
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:

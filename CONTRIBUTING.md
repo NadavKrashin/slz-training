@@ -126,21 +126,31 @@ firebase deploy --project production
 
 ## Secrets setup (first-time, repo owner only)
 
-### 1. Get a Firebase CI token
-
-```bash
-firebase login:ci
-```
-
-Copy the token.
-
-### 2. Create the staging Firebase project
+### 1. Create the staging Firebase project
 
 ```bash
 firebase projects:create slz-training-staging
 ```
 
-Then configure it: enable Auth (Google + Email), Firestore, Functions, and Cloud Messaging in the Firebase Console.
+Then configure it in the Firebase Console: enable Auth (Google + Email/Password), Firestore, Functions, and Cloud Messaging.
+
+### 2. Create service accounts for GitHub Actions
+
+CI uses dedicated service accounts — not personal CLI tokens — so deploys are not tied to any individual's credentials.
+
+**For each project (staging and production):**
+
+1. Go to [Google Cloud Console → IAM → Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) for the project
+2. Click **Create Service Account**
+   - Name: `github-actions-deploy`
+   - Description: `GitHub Actions deployment`
+3. Grant these roles:
+   - `Firebase Admin` (covers Hosting, Functions, Firestore rules)
+   - `Cloud Functions Developer` (if not included above)
+4. Click the service account → **Keys** tab → **Add Key** → JSON
+5. Download the JSON file — this is the secret value
+
+Alternatively, `firebase init hosting:github` automates steps 1–4 for the Hosting service account.
 
 ### 3. Add GitHub Secrets
 
@@ -148,17 +158,18 @@ Go to **GitHub repo → Settings → Secrets and variables → Actions**.
 
 Add the following secrets:
 
-| Secret | Description |
-|--------|-------------|
-| `FIREBASE_TOKEN` | Token from `firebase login:ci` |
-| `STAGING_FIREBASE_API_KEY` | From staging project settings |
+| Secret | Value |
+|--------|-------|
+| `FIREBASE_SERVICE_ACCOUNT_STAGING` | Full JSON content of staging service account key |
+| `FIREBASE_SERVICE_ACCOUNT_PRODUCTION` | Full JSON content of production service account key |
+| `STAGING_FIREBASE_API_KEY` | From staging Firebase Console → Project settings → Your apps |
 | `STAGING_FIREBASE_AUTH_DOMAIN` | |
 | `STAGING_FIREBASE_PROJECT_ID` | `slz-training-staging` |
 | `STAGING_FIREBASE_STORAGE_BUCKET` | |
 | `STAGING_FIREBASE_MESSAGING_SENDER_ID` | |
 | `STAGING_FIREBASE_APP_ID` | |
-| `STAGING_FIREBASE_VAPID_KEY` | From Cloud Messaging → Web Push certs |
-| `PROD_FIREBASE_API_KEY` | From production project settings |
+| `STAGING_FIREBASE_VAPID_KEY` | Cloud Messaging → Web Push certificates → Key pair |
+| `PROD_FIREBASE_API_KEY` | From production Firebase Console → Project settings → Your apps |
 | `PROD_FIREBASE_AUTH_DOMAIN` | |
 | `PROD_FIREBASE_PROJECT_ID` | `slz-training` |
 | `PROD_FIREBASE_STORAGE_BUCKET` | |
@@ -166,7 +177,7 @@ Add the following secrets:
 | `PROD_FIREBASE_APP_ID` | |
 | `PROD_FIREBASE_VAPID_KEY` | |
 
-Firebase project settings are at: Firebase Console → Project settings → General → Your apps.
+The `NEXT_PUBLIC_FIREBASE_*` values are non-secret (they're embedded in the client bundle), but GitHub Secrets is still the right place to store them so environment-specific values are not hardcoded in the workflow files.
 
 ### 4. Create GitHub Environments
 

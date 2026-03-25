@@ -152,39 +152,37 @@ CI uses dedicated service accounts — not personal CLI tokens — so deploys ar
 
 Alternatively, `firebase init hosting:github` automates steps 1–4 for the Hosting service account.
 
-### 3. Add GitHub Secrets
+### 3. Create GitHub Environments and add secrets
 
-Go to **GitHub repo → Settings → Secrets and variables → Actions**.
+Secrets are scoped per environment — the same name resolves to a different value in `staging` vs `production`. Go to **GitHub repo → Settings → Environments**, create each environment, and add its secrets under **Environment secrets**.
 
-Add the following secrets:
+**In the `staging` environment:**
 
 | Secret | Value |
 |--------|-------|
-| `FIREBASE_SERVICE_ACCOUNT_STAGING` | Full JSON content of staging service account key |
-| `FIREBASE_SERVICE_ACCOUNT_PRODUCTION` | Full JSON content of production service account key |
-| `STAGING_FIREBASE_API_KEY` | From staging Firebase Console → Project settings → Your apps |
-| `STAGING_FIREBASE_AUTH_DOMAIN` | |
-| `STAGING_FIREBASE_PROJECT_ID` | `slz-training-dev` |
-| `STAGING_FIREBASE_STORAGE_BUCKET` | |
-| `STAGING_FIREBASE_MESSAGING_SENDER_ID` | |
-| `STAGING_FIREBASE_APP_ID` | |
-| `STAGING_FIREBASE_VAPID_KEY` | Cloud Messaging → Web Push certificates → Key pair |
-| `PROD_FIREBASE_API_KEY` | From production Firebase Console → Project settings → Your apps |
-| `PROD_FIREBASE_AUTH_DOMAIN` | |
-| `PROD_FIREBASE_PROJECT_ID` | `slz-training` |
-| `PROD_FIREBASE_STORAGE_BUCKET` | |
-| `PROD_FIREBASE_MESSAGING_SENDER_ID` | |
-| `PROD_FIREBASE_APP_ID` | |
-| `PROD_FIREBASE_VAPID_KEY` | |
+| `FIREBASE_SERVICE_ACCOUNT` | Full JSON content of the staging service account key |
+| `FIREBASE_API_KEY` | Firebase Console → slz-training-dev → Project settings → Your apps |
+| `FIREBASE_AUTH_DOMAIN` | |
+| `FIREBASE_PROJECT_ID` | `slz-training-dev` |
+| `FIREBASE_STORAGE_BUCKET` | |
+| `FIREBASE_MESSAGING_SENDER_ID` | |
+| `FIREBASE_APP_ID` | |
+| `FIREBASE_VAPID_KEY` | Cloud Messaging → Web Push certificates → Key pair |
 
-The `NEXT_PUBLIC_FIREBASE_*` values are non-secret (they're embedded in the client bundle), but GitHub Secrets is still the right place to store them so environment-specific values are not hardcoded in the workflow files.
+**In the `production` environment:**
 
-### 4. Create GitHub Environments
+| Secret | Value |
+|--------|-------|
+| `FIREBASE_SERVICE_ACCOUNT` | Full JSON content of the production service account key |
+| `FIREBASE_API_KEY` | Firebase Console → slz-training → Project settings → Your apps |
+| `FIREBASE_AUTH_DOMAIN` | |
+| `FIREBASE_PROJECT_ID` | `slz-training` |
+| `FIREBASE_STORAGE_BUCKET` | |
+| `FIREBASE_MESSAGING_SENDER_ID` | |
+| `FIREBASE_APP_ID` | |
+| `FIREBASE_VAPID_KEY` | Cloud Messaging → Web Push certificates → Key pair |
 
-Go to **GitHub repo → Settings → Environments**.
-
-- Create `staging` — no restrictions needed
-- Create `production` — add Required reviewers for approval gate
+Add Required reviewers to `production` for the approval gate.
 
 ---
 

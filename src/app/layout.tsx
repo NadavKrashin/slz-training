@@ -9,6 +9,7 @@ import { Heebo } from 'next/font/google';
 import { theme } from '@/theme/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { DevToolbarWrapper } from '@/components/dev/DevToolbarWrapper';
 
 const heebo = Heebo({ subsets: ['hebrew', 'latin'] });
@@ -43,9 +44,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MantineProvider theme={theme} defaultColorScheme="light">
             <Notifications position="top-center" />
             <AuthProvider>
-              <OfflineBanner />
-              {children}
-              <DevToolbarWrapper />
+              <ErrorBoundary>
+                <OfflineBanner />
+                {children}
+                <DevToolbarWrapper />
+              </ErrorBoundary>
             </AuthProvider>
           </MantineProvider>
         </DirectionProvider>

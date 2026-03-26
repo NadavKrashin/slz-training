@@ -2,7 +2,10 @@
 
 import { Box, Text, Stack, Group } from '@mantine/core';
 
-interface MascotProps { isCompleted: boolean; message: string; }
+interface MascotProps {
+  isCompleted: boolean;
+  message: string;
+}
 
 export function Mascot({ isCompleted, message }: MascotProps) {
   return (
@@ -11,9 +14,7 @@ export function Mascot({ isCompleted, message }: MascotProps) {
       py="sm"
       style={{
         borderRadius: 'var(--mantine-radius-lg)',
-        background: isCompleted
-          ? 'rgba(255,255,255,0.2)'
-          : 'rgba(255,255,255,0.12)',
+        background: isCompleted ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.12)',
       }}
     >
       <Group align="center" gap="md">

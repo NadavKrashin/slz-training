@@ -30,7 +30,9 @@ export function TimerSettings() {
       notifications.show({ title: 'נשמר', message: 'תאריך יום הספורט עודכן', color: 'green' });
     } catch {
       notifications.show({ title: 'שגיאה', message: 'העדכון נכשל', color: 'red' });
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <Text c="dimmed">טוען...</Text>;
@@ -40,7 +42,9 @@ export function TimerSettings() {
       <Card>
         <Stack gap="md">
           <Text fw={600}>תאריך יום הספורט</Text>
-          <Text size="sm" c="dimmed">הגדר את התאריך שאליו הטיימר סופר אחורה</Text>
+          <Text size="sm" c="dimmed">
+            הגדר את התאריך שאליו הטיימר סופר אחורה
+          </Text>
           <DateTimePicker
             value={dueDate}
             onChange={setDueDate}
@@ -48,7 +52,9 @@ export function TimerSettings() {
             locale="he"
             clearable
           />
-          <Button onClick={handleSave} loading={saving} disabled={!dueDate}>שמור</Button>
+          <Button onClick={handleSave} loading={saving} disabled={!dueDate}>
+            שמור
+          </Button>
         </Stack>
       </Card>
     </Stack>

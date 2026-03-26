@@ -12,9 +12,6 @@
  * - Motivational messages
  */
 
-process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-
 import * as admin from 'firebase-admin';
 
 admin.initializeApp({ projectId: 'demo-slz-training' });
@@ -86,7 +83,7 @@ const WORKOUTS = [
       s('s9', 'ברפי', 'exercise', 45, 9), s('s10', 'מנוחה', 'rest', 20, 10),
       s('s11', 'גשר ישבן', 'exercise', 50, 11), s('s12', 'מנוחה', 'rest', 15, 12),
       s('s13', 'מטפסי הרים', 'exercise', 45, 13), s('s14', 'מנוחה', 'rest', 15, 14),
-      s('s15', 'כפיפות בטן', 'exercise', 50, 15), s('s16', 'מתיחה', 'rest', 55, 16),
+      s('s15', 'כפיפות בטן', 'exercise', 50, 15), s('s16', 'מתיחה', 'rest', 100, 16),
     ],
   },
 ] as const;

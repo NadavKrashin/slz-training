@@ -8,7 +8,9 @@ export default function TimerPage() {
   return (
     <PageContainer>
       <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">הגדרות טיימר</Text>
+        <Text size="xl" fw={700} ta="center">
+          הגדרות טיימר
+        </Text>
         <TimerSettings />
       </Stack>
     </PageContainer>

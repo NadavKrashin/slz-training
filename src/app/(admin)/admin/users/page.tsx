@@ -8,7 +8,9 @@ export default function UsersPage() {
   return (
     <PageContainer>
       <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">משתמשים</Text>
+        <Text size="xl" fw={700} ta="center">
+          משתמשים
+        </Text>
         <UsersList />
       </Stack>
     </PageContainer>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { TextInput, PasswordInput, Button, Stack, Text, Anchor, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
@@ -10,7 +9,6 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
   const { signIn, signInAsGuest } = useAuth();
-  const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
@@ -26,18 +24,33 @@ export function LoginForm() {
   const handleSubmit = form.onSubmit(async (values) => {
     setError('');
     setLoading(true);
-    try { await signIn(values.email, values.password); router.push('/home'); }
-    catch { setError('אימייל או סיסמה שגויים'); }
-    finally { setLoading(false); }
+    try {
+      await signIn(values.email, values.password);
+    } catch {
+      setError('אימייל או סיסמה שגויים');
+    } finally {
+      setLoading(false);
+    }
   });
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="md">
-        {error && <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">{error}</Alert>}
-        <TextInput label="אימייל" placeholder="your@email.com" type="email" {...form.getInputProps('email')} />
+        {error && (
+          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+            {error}
+          </Alert>
+        )}
+        <TextInput
+          label="אימייל"
+          placeholder="your@email.com"
+          type="email"
+          {...form.getInputProps('email')}
+        />
         <PasswordInput label="סיסמה" placeholder="הכנס סיסמה" {...form.getInputProps('password')} />
-        <Button type="submit" fullWidth loading={loading} size="md">התחברות</Button>
+        <Button type="submit" fullWidth loading={loading} size="md">
+          התחברות
+        </Button>
         <GoogleSignInButton />
         <Button
           variant="light"
@@ -47,15 +60,26 @@ export function LoginForm() {
           loading={guestLoading}
           onClick={async () => {
             setGuestLoading(true);
-            try { await signInAsGuest(); router.push('/home'); }
-            catch { setError('כניסה כאורח נכשלה'); }
-            finally { setGuestLoading(false); }
+            try {
+              await signInAsGuest();
+            } catch {
+              setError('כניסה כאורח נכשלה');
+            } finally {
+              setGuestLoading(false);
+            }
           }}
         >
           כניסה כאורח
         </Button>
-        <Text size="sm" ta="center">אין לך חשבון? <Anchor href="/register" fw={600}>הרשמה</Anchor></Text>
-        <Text size="sm" ta="center"><Anchor href="/forgot-password">שכחתי סיסמה</Anchor></Text>
+        <Text size="sm" ta="center">
+          אין לך חשבון?{' '}
+          <Anchor href="/register" fw={600}>
+            הרשמה
+          </Anchor>
+        </Text>
+        <Text size="sm" ta="center">
+          <Anchor href="/forgot-password">שכחתי סיסמה</Anchor>
+        </Text>
       </Stack>
     </form>
   );

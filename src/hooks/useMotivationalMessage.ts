@@ -16,11 +16,14 @@ export function useMotivationalMessage() {
     fetched.current = true;
     getActiveMessages()
       .then((messages) => {
-        const texts = messages.length > 0 ? messages.map((m) => m.text) : MOTIVATIONAL_MESSAGES_SEED;
+        const texts =
+          messages.length > 0 ? messages.map((m) => m.text) : MOTIVATIONAL_MESSAGES_SEED;
         setMessage(texts[Math.floor(Math.random() * texts.length)]);
       })
       .catch(() => {
-        setMessage(MOTIVATIONAL_MESSAGES_SEED[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES_SEED.length)]);
+        setMessage(
+          MOTIVATIONAL_MESSAGES_SEED[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES_SEED.length)]
+        );
       })
       .finally(() => setLoading(false));
   }, [user]);

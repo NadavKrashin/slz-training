@@ -46,7 +46,9 @@ export default function HomePage() {
       {/* Content below, clean spacing */}
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
-          {workout && !workoutLoading && <WorkoutCard workout={workout} isCompleted={isCompleted} />}
+          {workout && !workoutLoading && (
+            <WorkoutCard workout={workout} isCompleted={isCompleted} />
+          )}
           {!workout && !workoutLoading && (
             <Box
               p="xl"
@@ -56,7 +58,9 @@ export default function HomePage() {
                 background: '#f0f2ff',
               }}
             >
-              <Text c="brand.6" fw={500}>אין אימון מוגדר להיום</Text>
+              <Text c="brand.6" fw={500}>
+                אין אימון מוגדר להיום
+              </Text>
             </Box>
           )}
         </Stack>

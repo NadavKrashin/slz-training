@@ -37,9 +37,14 @@ service cloud.firestore {
     }
 
     // Workout completions
+    // Document IDs follow the pattern {uid}_{dateKey}.
+    // Keep both checks:
+    // - docId match allows single-doc reads before the doc exists.
+    // - uid field allows collection queries (history/streak) to pass rules.
     match /workoutCompletions/{docId} {
       allow read: if isAuth() && (
         resource.data.uid == request.auth.uid ||
+        docId.matches(request.auth.uid + '_.+') ||
         isAdmin()
       );
       allow create: if isAuth() &&

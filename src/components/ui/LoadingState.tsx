@@ -11,7 +11,9 @@ export function LoadingState({ message = 'טוען...' }: LoadingStateProps) {
     <Center py="xl" mih={200}>
       <Stack align="center" gap="sm">
         <Loader color="brand.5" size="lg" />
-        <Text size="sm" c="brand.5">{message}</Text>
+        <Text size="sm" c="brand.5">
+          {message}
+        </Text>
       </Stack>
     </Center>
   );

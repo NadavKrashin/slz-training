@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { logger } from 'firebase-functions/v2';
 import { defineString } from 'firebase-functions/params';
 import { admin, db } from './firebase';
 
@@ -25,6 +26,12 @@ export const setAdminClaim = onCall(async (request) => {
   await db.collection('users').doc(targetUid).update({
     role: 'admin',
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  logger.info('Admin claim granted', {
+    targetUid,
+    grantedBy: request.auth?.uid,
+    via: isBootstrap ? 'bootstrap' : 'admin',
   });
 
   return { success: true };

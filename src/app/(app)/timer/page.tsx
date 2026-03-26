@@ -21,14 +21,18 @@ export default function TimerPage() {
         <Stack gap="xl" align="center" px="md">
           <Stack align="center" gap={8}>
             <IconClock size={28} color="rgba(255,255,255,0.7)" />
-            <Text size="lg" fw={700} c="white">יום ספורט</Text>
+            <Text size="lg" fw={700} c="white">
+              יום ספורט
+            </Text>
           </Stack>
           {loading ? (
             <Text c="rgba(255,255,255,0.7)">טוען...</Text>
           ) : hasTarget ? (
             <CountdownTimer days={days} hours={hours} minutes={minutes} seconds={seconds} />
           ) : (
-            <Text c="rgba(255,255,255,0.6)" ta="center">לא הוגדר תאריך ליום הספורט</Text>
+            <Text c="rgba(255,255,255,0.6)" ta="center">
+              לא הוגדר תאריך ליום הספורט
+            </Text>
           )}
         </Stack>
       </Center>

@@ -8,7 +8,9 @@ export default function MessagesPage() {
   return (
     <PageContainer>
       <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">הודעות מוטיבציה</Text>
+        <Text size="xl" fw={700} ta="center">
+          הודעות מוטיבציה
+        </Text>
         <MessagesList />
       </Stack>
     </PageContainer>

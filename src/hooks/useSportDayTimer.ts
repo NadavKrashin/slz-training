@@ -5,8 +5,13 @@ import { subscribeToAppSettings } from '@/lib/firebase/firestore';
 import { now } from '@/lib/clock';
 
 interface CountdownValues {
-  days: number; hours: number; minutes: number; seconds: number;
-  total: number; loading: boolean; hasTarget: boolean;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  total: number;
+  loading: boolean;
+  hasTarget: boolean;
 }
 
 export function useSportDayTimer(): CountdownValues {
@@ -16,8 +21,11 @@ export function useSportDayTimer(): CountdownValues {
 
   useEffect(() => {
     const unsub = subscribeToAppSettings((settings) => {
-      if (settings?.sportDayDueDate) { setTargetMs(settings.sportDayDueDate.toMillis()); }
-      else { setTargetMs(null); }
+      if (settings?.sportDayDueDate) {
+        setTargetMs(settings.sportDayDueDate.toMillis());
+      } else {
+        setTargetMs(null);
+      }
       setLoading(false);
     });
     return unsub;

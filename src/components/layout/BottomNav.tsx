@@ -25,7 +25,11 @@ export function BottomNav() {
   return (
     <Box
       style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
         background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, #ffffff 100%)',
         backdropFilter: 'blur(12px)',
         borderTop: '1px solid var(--mantine-color-brand-1)',
@@ -36,19 +40,29 @@ export function BottomNav() {
         {items.map((item) => {
           const isActive = pathname.startsWith(item.path);
           return (
-            <UnstyledButton key={item.path} onClick={() => router.push(item.path)} style={{ flex: 1 }}>
+            <UnstyledButton
+              key={item.path}
+              onClick={() => router.push(item.path)}
+              style={{ flex: 1 }}
+            >
               <Stack align="center" gap={2}>
                 <Box
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: 44, height: 30, borderRadius: 15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 44,
+                    height: 30,
+                    borderRadius: 15,
                     background: isActive ? 'var(--mantine-color-brand-1)' : 'transparent',
                     transition: 'background 0.2s ease',
                   }}
                 >
                   <item.icon
                     size={22}
-                    color={isActive ? 'var(--mantine-color-brand-6)' : 'var(--mantine-color-gray-5)'}
+                    color={
+                      isActive ? 'var(--mantine-color-brand-6)' : 'var(--mantine-color-gray-5)'
+                    }
                     stroke={isActive ? 2.5 : 1.5}
                   />
                 </Box>

@@ -1,16 +1,20 @@
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import app from './config';
 import { updateUser } from './firestore';
+import { isBrowser, hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
 
 let messaging: ReturnType<typeof getMessaging> | null = null;
 
 function getMessagingInstance() {
-  if (typeof window === 'undefined') return null;
-  if (!messaging) { messaging = getMessaging(app); }
+  if (!isBrowser) return null;
+  if (!messaging) {
+    messaging = getMessaging(app);
+  }
   return messaging;
 }
 
 export async function requestNotificationPermission(uid: string): Promise<boolean> {
+  if (!hasNotificationAPI) return false;
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return false;
@@ -20,7 +24,9 @@ export async function requestNotificationPermission(uid: string): Promise<boolea
     if (!token) return false;
     await updateUser(uid, { fcmToken: token });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -29,14 +35,15 @@ export async function requestNotificationPermission(uid: string): Promise<boolea
  * Firestore always has the current token.
  */
 export async function syncFcmToken(uid: string): Promise<void> {
-  if (typeof window === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
+  if (!hasNotificationAPI || getNotificationPermission() !== 'granted') return;
   try {
     const msg = getMessagingInstance();
     if (!msg) return;
     const token = await getToken(msg, { vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY });
     if (token) await updateUser(uid, { fcmToken: token });
-  } catch { /* silently ignore — not critical */ }
+  } catch {
+    /* silently ignore — not critical */
+  }
 }
 
 export function onForegroundMessage(callback: (payload: any) => void) {

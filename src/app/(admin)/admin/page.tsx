@@ -19,10 +19,18 @@ export default function AdminDashboard() {
   return (
     <PageContainer>
       <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">ניהול</Text>
+        <Text size="xl" fw={700} ta="center">
+          ניהול
+        </Text>
         <SimpleGrid cols={2} spacing="md">
           {links.map(({ href, label, icon: Icon, color }) => (
-            <Card key={href} padding="lg" withBorder style={{ cursor: 'pointer' }} onClick={() => router.push(href)}>
+            <Card
+              key={href}
+              padding="lg"
+              withBorder
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push(href)}
+            >
               <Stack align="center" gap="sm">
                 <ThemeIcon size="xl" variant="light" color={color} radius="xl">
                   <Icon size={24} />

@@ -33,8 +33,12 @@ export function CompletionScreen({ streak }: { streak: number }) {
           <ThemeIcon size={80} radius="xl" color="white" variant="filled" c="brand.6">
             <IconCheck size={48} />
           </ThemeIcon>
-          <Text size="2rem" fw={700} ta="center" c="white">כל הכבוד!</Text>
-          <Text size="lg" c="rgba(255,255,255,0.8)" ta="center">סיימת את האימון של היום!</Text>
+          <Text size="2rem" fw={700} ta="center" c="white">
+            כל הכבוד!
+          </Text>
+          <Text size="lg" c="rgba(255,255,255,0.8)" ta="center">
+            סיימת את האימון של היום!
+          </Text>
           {newStreak > 0 && (
             <Box
               px="xl"
@@ -45,11 +49,19 @@ export function CompletionScreen({ streak }: { streak: number }) {
                 backdropFilter: 'blur(8px)',
               }}
             >
-              <Text size="xl" fw={700} c="white" ta="center">🔥 {newStreak} ימים רצוף!</Text>
+              <Text size="xl" fw={700} c="white" ta="center">
+                🔥 {newStreak} ימים רצוף!
+              </Text>
             </Box>
           )}
           <Text style={{ fontSize: 64 }}>🎉</Text>
-          <Button size="lg" color="white" c="brand.7" leftSection={<IconHome size={20} />} onClick={() => router.push('/home')}>
+          <Button
+            size="lg"
+            color="white"
+            c="brand.7"
+            leftSection={<IconHome size={20} />}
+            onClick={() => router.push('/home')}
+          >
             חזרה לדף הבית
           </Button>
         </Stack>

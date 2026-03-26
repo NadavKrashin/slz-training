@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { TextInput, PasswordInput, Button, Stack, Text, Anchor, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
@@ -10,7 +9,6 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
   const { signIn, signInAsGuest } = useAuth();
-  const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
@@ -28,7 +26,6 @@ export function LoginForm() {
     setLoading(true);
     try {
       await signIn(values.email, values.password);
-      router.push('/home');
     } catch {
       setError('אימייל או סיסמה שגויים');
     } finally {
@@ -65,7 +62,6 @@ export function LoginForm() {
             setGuestLoading(true);
             try {
               await signInAsGuest();
-              router.push('/home');
             } catch {
               setError('כניסה כאורח נכשלה');
             } finally {

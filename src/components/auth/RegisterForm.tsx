@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { TextInput, PasswordInput, Button, Stack, Text, Anchor, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
@@ -10,7 +9,6 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function RegisterForm() {
   const { signUp } = useAuth();
-  const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +27,6 @@ export function RegisterForm() {
     setLoading(true);
     try {
       await signUp(values.email, values.password, values.displayName);
-      router.push('/home');
     } catch (e: any) {
       setError(
         e?.code === 'auth/email-already-in-use' ? 'אימייל כבר קיים במערכת' : 'שגיאה בהרשמה, נסה שוב'

@@ -1,11 +1,12 @@
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import app from './config';
 import { updateUser } from './firestore';
+import { isBrowser, hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
 
 let messaging: ReturnType<typeof getMessaging> | null = null;
 
 function getMessagingInstance() {
-  if (typeof window === 'undefined') return null;
+  if (!isBrowser) return null;
   if (!messaging) {
     messaging = getMessaging(app);
   }
@@ -13,6 +14,7 @@ function getMessagingInstance() {
 }
 
 export async function requestNotificationPermission(uid: string): Promise<boolean> {
+  if (!hasNotificationAPI) return false;
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return false;
@@ -33,8 +35,7 @@ export async function requestNotificationPermission(uid: string): Promise<boolea
  * Firestore always has the current token.
  */
 export async function syncFcmToken(uid: string): Promise<void> {
-  if (typeof window === 'undefined' || typeof Notification === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
+  if (!hasNotificationAPI || getNotificationPermission() !== 'granted') return;
   try {
     const msg = getMessagingInstance();
     if (!msg) return;

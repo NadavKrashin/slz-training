@@ -16,6 +16,7 @@ import {
   updateDisplayName,
 } from '@/lib/firebase/auth';
 import { syncFcmToken } from '@/lib/firebase/messaging';
+import { hasNotificationAPI } from '@/lib/browser';
 
 interface AuthContextValue {
   user: User | null;
@@ -65,10 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Only sync existing token — never prompt for permission here.
         // Browsers require a user gesture to call Notification.requestPermission();
         // the profile page handles that via a button.
-        if (!isAnon && typeof window !== 'undefined' && typeof Notification !== 'undefined') {
-          if (Notification.permission === 'granted') {
-            syncFcmToken(firebaseUser.uid);
-          }
+        if (!isAnon && hasNotificationAPI) {
+          syncFcmToken(firebaseUser.uid);
         }
       } else {
         setIsAdmin(false);

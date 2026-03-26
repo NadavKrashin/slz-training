@@ -21,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/hooks/useUser';
 import { useStreak } from '@/hooks/useStreak';
 import { requestNotificationPermission } from '@/lib/firebase/messaging';
+import { hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
@@ -39,9 +40,7 @@ export default function ProfilePage() {
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
-    typeof window !== 'undefined' && typeof Notification !== 'undefined'
-      ? Notification.permission
-      : 'default'
+    getNotificationPermission
   );
 
   // Guest upgrade state
@@ -78,7 +77,7 @@ export default function ProfilePage() {
   const handleNotifications = async () => {
     if (!user) return;
     const granted = await requestNotificationPermission(user.uid);
-    setNotifPermission(typeof Notification !== 'undefined' ? Notification.permission : 'default');
+    setNotifPermission(getNotificationPermission());
     if (granted) {
       notifications.show({ title: 'הופעלו', message: 'התראות הופעלו בהצלחה', color: 'green' });
     } else {
@@ -262,7 +261,7 @@ export default function ProfilePage() {
                 />
               </Card>
 
-              {notifPermission !== 'granted' && (
+              {hasNotificationAPI && notifPermission !== 'granted' && (
                 <Button variant="light" onClick={handleNotifications}>
                   הפעל התראות
                 </Button>

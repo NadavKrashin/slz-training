@@ -6,14 +6,17 @@ import { Button } from '@mantine/core';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ onClick }: { onClick?: () => Promise<void> } = {}) {
   const { signInWithGoogle } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     setLoading(true);
-    try { await signInWithGoogle(); router.push('/home'); }
+    try {
+      if (onClick) { await onClick(); }
+      else { await signInWithGoogle(); router.push('/home'); }
+    }
     catch { /* cancelled */ }
     finally { setLoading(false); }
   };

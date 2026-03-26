@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { subscribeToAppSettings } from '@/lib/firebase/firestore';
+import { now } from '@/lib/clock';
 
 interface CountdownValues {
   days: number; hours: number; minutes: number; seconds: number;
@@ -11,7 +12,7 @@ interface CountdownValues {
 export function useSportDayTimer(): CountdownValues {
   const [targetMs, setTargetMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [now, setNow] = useState(Date.now());
+  const [current, setCurrent] = useState(now());
 
   useEffect(() => {
     const unsub = subscribeToAppSettings((settings) => {
@@ -23,7 +24,7 @@ export function useSportDayTimer(): CountdownValues {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
+    const interval = setInterval(() => setCurrent(now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -31,7 +32,7 @@ export function useSportDayTimer(): CountdownValues {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0, loading, hasTarget: false };
   }
 
-  const diff = Math.max(0, targetMs - now);
+  const diff = Math.max(0, targetMs - current);
   const totalSeconds = Math.floor(diff / 1000);
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);

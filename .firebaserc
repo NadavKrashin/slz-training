@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "slz-training"
+    "default": "slz-training",
+    "production": "slz-training",
+    "dev": "slz-training-dev"
   }
 }

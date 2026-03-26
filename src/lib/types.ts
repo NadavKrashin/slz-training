@@ -5,7 +5,7 @@ export interface UserProfile {
   email: string;
   displayName: string;
   shareCompletionWithAdmin: boolean;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'guest';
   fcmToken?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;

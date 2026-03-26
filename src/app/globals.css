@@ -9,8 +9,39 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(180deg, #eef3ff 0%, #f4f6ff 50%, #eef3ff 100%);
+  min-height: 100dvh;
 }
 
 html {
   direction: rtl;
+}
+
+/* Gradient hero section used on key pages */
+.hero-gradient {
+  background: linear-gradient(135deg, #4c6ef5 0%, #5c7cfa 40%, #748ffc 100%);
+  color: #ffffff;
+  border-radius: 0 0 24px 24px;
+  padding: 24px 20px 32px;
+  margin: -16px -16px 0;
+  text-align: center;
+}
+
+/* Immersive full-screen gradient for workout/timer */
+.immersive-gradient {
+  background: linear-gradient(160deg, #364fc7 0%, #4c6ef5 50%, #5c7cfa 100%);
+  min-height: 100dvh;
+  color: #ffffff;
+}
+
+/* Blue-tinted card surface */
+.blue-surface {
+  background: linear-gradient(135deg, #eef3ff 0%, #dbe4ff 100%);
+}
+
+/* Floating card with stronger blue shadow */
+.featured-card {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(76, 110, 245, 0.12), 0 1px 4px rgba(76, 110, 245, 0.06);
+  border-radius: var(--mantine-radius-lg);
 }

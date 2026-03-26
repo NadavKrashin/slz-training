@@ -1,6 +1,6 @@
 'use client';
 
-import { SimpleGrid, Center, Text, Stack } from '@mantine/core';
+import { SimpleGrid, Center, Text, Stack, Card } from '@mantine/core';
 import { HEBREW_DAYS_SHORT } from '@/lib/constants';
 import { getDaysInMonth, getFirstDayOfMonth, getTodayDateKey } from '@/lib/dates';
 import type { DayStatus, WorkoutCompletion } from '@/lib/types';
@@ -32,11 +32,13 @@ export function CalendarGrid({ year, month, completions, workoutDates }: Calenda
   }
 
   return (
-    <Stack gap="xs">
-      <SimpleGrid cols={7} spacing={4}>
-        {HEBREW_DAYS_SHORT.map((d) => (<Center key={d} h={30}><Text size="xs" fw={600} c="dimmed">{d}</Text></Center>))}
-      </SimpleGrid>
-      <SimpleGrid cols={7} spacing={4}>{cells}</SimpleGrid>
-    </Stack>
+    <Card p="md" style={{ background: 'linear-gradient(135deg, #f8f9ff 0%, #eef3ff 100%)' }}>
+      <Stack gap="xs">
+        <SimpleGrid cols={7} spacing={4}>
+          {HEBREW_DAYS_SHORT.map((d) => (<Center key={d} h={30}><Text size="xs" fw={600} c="brand.5">{d}</Text></Center>))}
+        </SimpleGrid>
+        <SimpleGrid cols={7} spacing={4}>{cells}</SimpleGrid>
+      </Stack>
+    </Card>
   );
 }

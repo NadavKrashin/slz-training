@@ -1,11 +1,10 @@
 'use client';
 
-import { Stack, Text } from '@mantine/core';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { Stack, Text, Box, Container } from '@mantine/core';
 import { WorkoutCard } from '@/components/home/WorkoutCard';
 import { StreakBadge } from '@/components/home/StreakBadge';
 import { Mascot } from '@/components/home/Mascot';
-import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { NAV_HEIGHT } from '@/lib/constants';
 import { useUser } from '@/hooks/useUser';
 import { useTodayWorkout } from '@/hooks/useTodayWorkout';
 import { useWorkoutCompletion } from '@/hooks/useWorkoutCompletion';
@@ -22,20 +21,46 @@ export default function HomePage() {
   const { message } = useMotivationalMessage();
 
   return (
-    <PageContainer>
-      <OfflineBanner />
-      <Stack gap="lg">
-        <Stack gap={4} align="center">
-          <Text size="xl" fw={700}>שלום, {userData?.displayName || 'חבר/ה'} 👋</Text>
-        </Stack>
+    <Box pb={NAV_HEIGHT + 24}>
+      {/* Unified hero: greeting + mascot + streak all inside one gradient */}
+      <Box
+        style={{
+          background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
+          borderRadius: '0 0 24px 24px',
+        }}
+        px="md"
+        pt={36}
+        pb={28}
+      >
+        <Container size="sm">
+          <Stack gap="md">
+            <Text size="lg" fw={700} c="white" ta="center">
+              שלום, {userData?.displayName || 'חבר/ה'} 👋
+            </Text>
+            <Mascot isCompleted={isCompleted} message={message} />
+            <StreakBadge streak={currentStreak} />
+          </Stack>
+        </Container>
+      </Box>
 
-        <Mascot isCompleted={isCompleted} message={message} />
-        <StreakBadge streak={currentStreak} />
-        {workout && !workoutLoading && <WorkoutCard workout={workout} isCompleted={isCompleted} />}
-        {!workout && !workoutLoading && (
-          <Text c="dimmed" ta="center">אין אימון מוגדר להיום</Text>
-        )}
-      </Stack>
-    </PageContainer>
+      {/* Content below, clean spacing */}
+      <Container size="sm" px="md" pt="lg">
+        <Stack gap="lg">
+          {workout && !workoutLoading && <WorkoutCard workout={workout} isCompleted={isCompleted} />}
+          {!workout && !workoutLoading && (
+            <Box
+              p="xl"
+              ta="center"
+              style={{
+                borderRadius: 'var(--mantine-radius-lg)',
+                background: '#f0f2ff',
+              }}
+            >
+              <Text c="brand.6" fw={500}>אין אימון מוגדר להיום</Text>
+            </Box>
+          )}
+        </Stack>
+      </Container>
+    </Box>
   );
 }

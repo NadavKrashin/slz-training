@@ -9,7 +9,13 @@ interface PageContainerProps extends ContainerProps {
 
 export function PageContainer({ withNavPadding = true, children, ...props }: PageContainerProps) {
   return (
-    <Container size="sm" px="md" py="md" pb={withNavPadding ? NAV_HEIGHT + 16 : 'md'} {...props}>
+    <Container
+      size="sm"
+      px="md"
+      pt="md"
+      pb={withNavPadding ? NAV_HEIGHT + 24 : 'md'}
+      {...props}
+    >
       {children}
     </Container>
   );

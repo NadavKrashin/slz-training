@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Stack, Text } from '@mantine/core';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { Stack, Text, Box, Container } from '@mantine/core';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
@@ -10,6 +9,7 @@ import { useCompletions } from '@/hooks/useCompletions';
 import { useStreak } from '@/hooks/useStreak';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import { getWorkoutsInRange } from '@/lib/firebase/firestore';
+import { NAV_HEIGHT } from '@/lib/constants';
 
 export default function HistoryPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -36,19 +36,37 @@ export default function HistoryPage() {
   const total = workoutDates.size;
 
   return (
-    <PageContainer>
-      <Stack gap="lg">
-        <Text size="xl" fw={700} ta="center">היסטוריה</Text>
-        <MonthNavigator label={getHebrewMonthYear(currentMonth)} onPrev={goPrev} onNext={goNext} canGoNext={canGoNext} />
-        {loading ? (
-          <Text c="dimmed" ta="center">טוען...</Text>
-        ) : (
-          <>
-            <CalendarGrid year={year} month={month} completions={completions} workoutDates={workoutDates} />
-            <MonthlySummary completed={completed} missed={total - completed} total={total} streak={currentStreak} />
-          </>
-        )}
-      </Stack>
-    </PageContainer>
+    <Box pb={NAV_HEIGHT + 24}>
+      {/* Header with title + month nav integrated */}
+      <Box
+        style={{
+          background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
+          borderRadius: '0 0 24px 24px',
+        }}
+        px="md"
+        pt={36}
+        pb={24}
+      >
+        <Container size="sm">
+          <Stack gap="md">
+            <Text size="lg" fw={700} c="white" ta="center">היסטוריה</Text>
+            <MonthNavigator label={getHebrewMonthYear(currentMonth)} onPrev={goPrev} onNext={goNext} canGoNext={canGoNext} />
+          </Stack>
+        </Container>
+      </Box>
+
+      <Container size="sm" px="md" pt="lg">
+        <Stack gap="lg">
+          {loading ? (
+            <Text c="dimmed" ta="center">טוען...</Text>
+          ) : (
+            <>
+              <CalendarGrid year={year} month={month} completions={completions} workoutDates={workoutDates} />
+              <MonthlySummary completed={completed} missed={total - completed} total={total} streak={currentStreak} />
+            </>
+          )}
+        </Stack>
+      </Container>
+    </Box>
   );
 }

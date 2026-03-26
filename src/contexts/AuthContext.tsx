@@ -53,27 +53,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }, 10000);
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      clearTimeout(timeout);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
         const isAnon = firebaseUser.isAnonymous;
         setIsGuest(isAnon);
-        try {
-          const tokenResult = await firebaseUser.getIdTokenResult();
-          setIsAdmin(tokenResult.claims.admin === true);
-        } catch (err) {
-          Sentry.captureException(err);
-          setIsAdmin(false);
-        }
+        firebaseUser
+          .getIdTokenResult()
+          .then((tokenResult) => {
+            setIsAdmin(tokenResult.claims.admin === true);
+          })
+          .catch((err) => {
+            Sentry.captureException(err);
+            setIsAdmin(false);
+          })
+          .finally(() => {
+            clearTimeout(timeout);
+            setLoading(false);
+          });
         if (!isAnon && hasNotificationAPI) {
           syncFcmToken(firebaseUser.uid);
         }
       } else {
         setIsAdmin(false);
         setIsGuest(false);
+        clearTimeout(timeout);
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => {
       clearTimeout(timeout);

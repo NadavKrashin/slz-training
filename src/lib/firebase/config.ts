@@ -11,7 +11,7 @@ import {
   getFirestore,
   initializeFirestore,
   persistentLocalCache,
-  persistentMultipleTabManager,
+  persistentSingleTabManager,
   memoryLocalCache,
   connectFirestoreEmulator,
 } from 'firebase/firestore';
@@ -53,7 +53,7 @@ function createFirestore() {
     return initializeFirestore(app, {
       localCache: useEmulators
         ? memoryLocalCache()
-        : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+        : persistentLocalCache({ tabManager: persistentSingleTabManager() }),
     });
   } catch {
     return getFirestore(app);

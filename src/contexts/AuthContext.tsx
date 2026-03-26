@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         firebaseUser.getIdTokenResult().then((tokenResult) => {
           setIsAdmin(tokenResult.claims.admin === true);
         });
-        if (!isAnon && typeof window !== 'undefined') {
+        if (!isAnon && typeof window !== 'undefined' && typeof Notification !== 'undefined') {
           if (Notification.permission === 'default') {
             requestNotificationPermission(firebaseUser.uid);
           } else {

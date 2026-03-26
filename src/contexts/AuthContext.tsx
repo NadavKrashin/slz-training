@@ -53,19 +53,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }, 10000);
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       clearTimeout(timeout);
       setUser(firebaseUser);
       if (firebaseUser) {
         const isAnon = firebaseUser.isAnonymous;
         setIsGuest(isAnon);
-        // Resolve admin claims and notifications async — never block the loading state
-        firebaseUser.getIdTokenResult().then((tokenResult) => {
+        try {
+          const tokenResult = await firebaseUser.getIdTokenResult();
           setIsAdmin(tokenResult.claims.admin === true);
-        });
-        // Only sync existing token — never prompt for permission here.
-        // Browsers require a user gesture to call Notification.requestPermission();
-        // the profile page handles that via a button.
+        } catch (err) {
+          Sentry.captureException(err);
+          setIsAdmin(false);
+        }
         if (!isAnon && hasNotificationAPI) {
           syncFcmToken(firebaseUser.uid);
         }

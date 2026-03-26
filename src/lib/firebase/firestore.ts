@@ -78,9 +78,16 @@ export function subscribeToUser(
   uid: string,
   callback: (user: UserProfile | null) => void
 ): Unsubscribe {
-  return onSnapshot(doc(db, 'users', uid), (snap) => {
-    callback(snap.exists() ? ({ ...snap.data(), uid: snap.id } as UserProfile) : null);
-  });
+  return onSnapshot(
+    doc(db, 'users', uid),
+    (snap) => {
+      callback(snap.exists() ? ({ ...snap.data(), uid: snap.id } as UserProfile) : null);
+    },
+    (error) => {
+      console.error('[subscribeToUser]', error);
+      callback(null);
+    }
+  );
 }
 
 export async function updateUser(uid: string, data: Partial<UserProfile>) {
@@ -96,9 +103,16 @@ export function subscribeToWorkout(
   dateKey: string,
   callback: (workout: Workout | null) => void
 ): Unsubscribe {
-  return onSnapshot(doc(db, 'workoutsByDate', dateKey), (snap) => {
-    callback(snap.exists() ? (snap.data() as Workout) : null);
-  });
+  return onSnapshot(
+    doc(db, 'workoutsByDate', dateKey),
+    (snap) => {
+      callback(snap.exists() ? (snap.data() as Workout) : null);
+    },
+    (error) => {
+      console.error('[subscribeToWorkout]', error);
+      callback(null);
+    }
+  );
 }
 
 export async function getWorkout(dateKey: string): Promise<Workout | null> {
@@ -148,9 +162,16 @@ export function subscribeToCompletion(
   dateKey: string,
   callback: (completion: WorkoutCompletion | null) => void
 ): Unsubscribe {
-  return onSnapshot(doc(db, 'workoutCompletions', completionDocId(uid, dateKey)), (snap) => {
-    callback(snap.exists() ? (snap.data() as WorkoutCompletion) : null);
-  });
+  return onSnapshot(
+    doc(db, 'workoutCompletions', completionDocId(uid, dateKey)),
+    (snap) => {
+      callback(snap.exists() ? (snap.data() as WorkoutCompletion) : null);
+    },
+    (error) => {
+      console.error('[subscribeToCompletion]', error);
+      callback(null);
+    }
+  );
 }
 
 export async function markWorkoutComplete(uid: string, dateKey: string, workoutTitle: string) {
@@ -202,9 +223,16 @@ export async function getCompletionsForDate(dateKey: string): Promise<WorkoutCom
 export function subscribeToAppSettings(
   callback: (settings: AppSettings | null) => void
 ): Unsubscribe {
-  return onSnapshot(doc(db, 'appSettings', 'general'), (snap) => {
-    callback(snap.exists() ? (snap.data() as AppSettings) : null);
-  });
+  return onSnapshot(
+    doc(db, 'appSettings', 'general'),
+    (snap) => {
+      callback(snap.exists() ? (snap.data() as AppSettings) : null);
+    },
+    (error) => {
+      console.error('[subscribeToAppSettings]', error);
+      callback(null);
+    }
+  );
 }
 
 export async function updateAppSettings(data: Partial<AppSettings>) {

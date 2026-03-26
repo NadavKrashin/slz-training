@@ -41,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Unregister stale service workers (keep FCM worker)
               if('serviceWorker' in navigator){
                 navigator.serviceWorker.getRegistrations().then(function(regs){
                   regs.forEach(function(r){
@@ -49,6 +50,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   });
                 });
               }
+              // Hydration watchdog: if React never signals auth loaded within 12s,
+              // reload the page once to recover from stale bundles or broken state.
+              (function(){
+                var key='__slz_reload';
+                if(sessionStorage.getItem(key)){sessionStorage.removeItem(key);return}
+                window.__slzReady=false;
+                setTimeout(function(){
+                  if(!window.__slzReady){
+                    sessionStorage.setItem(key,'1');
+                    location.reload();
+                  }
+                },12000);
+              })();
             `,
           }}
         />

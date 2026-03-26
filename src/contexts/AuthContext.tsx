@@ -44,13 +44,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    // Safety net: if onAuthStateChanged never fires (e.g. Firebase init failure),
-    // unblock the app after 10s and report to Sentry so we can diagnose it.
+    function resolveLoading() {
+      setLoading(false);
+      if (typeof window !== 'undefined') (window as any).__slzReady = true;
+    }
+
     const timeout = setTimeout(() => {
       try {
         Sentry.captureMessage('Auth initialization timed out', { level: 'error' });
-      } catch { /* must not prevent setLoading */ }
-      setLoading(false);
+      } catch { /* must not prevent resolveLoading */ }
+      resolveLoading();
     }, 10_000);
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -69,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })
           .finally(() => {
             clearTimeout(timeout);
-            setLoading(false);
+            resolveLoading();
           });
         if (!isAnon && hasNotificationAPI) {
           syncFcmToken(firebaseUser.uid);
@@ -78,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAdmin(false);
         setIsGuest(false);
         clearTimeout(timeout);
-        setLoading(false);
+        resolveLoading();
       }
     });
     return () => {

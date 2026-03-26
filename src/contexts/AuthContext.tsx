@@ -47,11 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Safety net: if onAuthStateChanged never fires (e.g. Firebase init failure),
     // unblock the app after 10s and report to Sentry so we can diagnose it.
     const timeout = setTimeout(() => {
-      Sentry.captureMessage('Auth initialization timed out — onAuthStateChanged never fired', {
-        level: 'error',
-      });
+      try {
+        Sentry.captureMessage('Auth initialization timed out', { level: 'error' });
+      } catch { /* must not prevent setLoading */ }
       setLoading(false);
-    }, 10000);
+    }, 10_000);
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);

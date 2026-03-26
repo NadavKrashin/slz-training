@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
+import * as Sentry from '@sentry/nextjs';
 import { auth } from '@/lib/firebase/config';
 import {
   signIn,
@@ -42,7 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
+    // Safety net: if onAuthStateChanged never fires (e.g. Firebase init failure),
+    // unblock the app after 10s and report to Sentry so we can diagnose it.
+    const timeout = setTimeout(() => {
+      Sentry.captureMessage('Auth initialization timed out — onAuthStateChanged never fired', {
+        level: 'error',
+      });
+      setLoading(false);
+    }, 10000);
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      clearTimeout(timeout);
       setUser(firebaseUser);
       if (firebaseUser) {
         const isAnon = firebaseUser.isAnonymous;
@@ -64,7 +75,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setLoading(false);
     });
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeout);
+      unsubscribe();
+    };
   }, []);
 
   const refreshClaims = async () => {

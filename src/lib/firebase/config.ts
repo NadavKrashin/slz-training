@@ -2,7 +2,6 @@ import { initializeApp, getApps } from 'firebase/app';
 import {
   getAuth,
   initializeAuth,
-  indexedDBLocalPersistence,
   browserLocalPersistence,
   inMemoryPersistence,
   connectAuthEmulator,
@@ -36,7 +35,7 @@ function createAuth() {
   if (typeof window === 'undefined') return getAuth(app);
   try {
     return initializeAuth(app, {
-      persistence: [indexedDBLocalPersistence, browserLocalPersistence, inMemoryPersistence],
+      persistence: [browserLocalPersistence, inMemoryPersistence],
     });
   } catch {
     return getAuth(app);

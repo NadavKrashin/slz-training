@@ -22,6 +22,10 @@ jobs:
       NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
       NEXT_PUBLIC_FIREBASE_VAPID_KEY: ${{ secrets.FIREBASE_VAPID_KEY }}
+      NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
     steps:
       - uses: actions/checkout@v4

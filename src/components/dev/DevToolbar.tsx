@@ -79,17 +79,12 @@ export function DevToolbar() {
     handleOffsetChange(diffSeconds / 3600);
   }, [handleOffsetChange]);
 
-  const triggerReminder = useCallback(async () => {
-    try {
-      const res = await fetch(
-        'http://localhost:5001/demo-slz-training/us-central1/sendDailyReminder',
-        { method: 'GET' }
-      );
-      if (res.ok) alert('Reminder triggered');
-      else alert(`Failed: ${res.status}`);
-    } catch {
-      alert('Failed — are emulators running?');
-    }
+  const triggerReminder = useCallback(() => {
+    const cmd = `curl -X POST http://localhost:5001/demo-slz-training/us-central1/sendDailyReminder-0 -H "Content-Type: application/json" -d '{}'`;
+    navigator.clipboard.writeText(cmd).then(
+      () => alert('Copied to clipboard — paste and run in terminal'),
+      () => alert(cmd)
+    );
   }, []);
 
   if (!open) {

@@ -37,9 +37,11 @@ service cloud.firestore {
     }
 
     // Workout completions
+    // Document IDs follow the pattern {uid}_{dateKey}.
+    // We check ownership via the ID so onSnapshot works even before the doc exists.
     match /workoutCompletions/{docId} {
       allow read: if isAuth() && (
-        resource.data.uid == request.auth.uid ||
+        docId.matches(request.auth.uid + '_.+') ||
         isAdmin()
       );
       allow create: if isAuth() &&

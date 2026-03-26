@@ -54,6 +54,7 @@ function createFirestore() {
       localCache: useEmulators
         ? memoryLocalCache()
         : persistentLocalCache({ tabManager: persistentSingleTabManager(undefined) }),
+      experimentalAutoDetectLongPolling: true,
     });
   } catch {
     return getFirestore(app);

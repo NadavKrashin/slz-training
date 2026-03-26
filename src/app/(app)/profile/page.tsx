@@ -39,7 +39,9 @@ export default function ProfilePage() {
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
-    typeof window !== 'undefined' ? Notification.permission : 'default'
+    typeof window !== 'undefined' && typeof Notification !== 'undefined'
+      ? Notification.permission
+      : 'default'
   );
 
   // Guest upgrade state
@@ -76,7 +78,7 @@ export default function ProfilePage() {
   const handleNotifications = async () => {
     if (!user) return;
     const granted = await requestNotificationPermission(user.uid);
-    setNotifPermission(Notification.permission);
+    setNotifPermission(typeof Notification !== 'undefined' ? Notification.permission : 'default');
     if (granted) {
       notifications.show({ title: 'הופעלו', message: 'התראות הופעלו בהצלחה', color: 'green' });
     } else {

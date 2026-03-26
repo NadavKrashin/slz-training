@@ -33,7 +33,7 @@ export async function requestNotificationPermission(uid: string): Promise<boolea
  * Firestore always has the current token.
  */
 export async function syncFcmToken(uid: string): Promise<void> {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || typeof Notification === 'undefined') return;
   if (Notification.permission !== 'granted') return;
   try {
     const msg = getMessagingInstance();

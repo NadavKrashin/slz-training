@@ -11,10 +11,15 @@ export function useTodayWorkout() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const interval = setInterval(() => {
+        const newKey = getTodayDateKey();
+        if (newKey !== dateKey) setDateKey(newKey);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
     const ms = getMsUntilMidnight();
-    const timeout = setTimeout(() => {
-      setDateKey(getTodayDateKey());
-    }, ms + 1000);
+    const timeout = setTimeout(() => setDateKey(getTodayDateKey()), ms + 1000);
     return () => clearTimeout(timeout);
   }, [dateKey]);
 

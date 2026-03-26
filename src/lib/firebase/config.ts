@@ -1,16 +1,10 @@
 import { initializeApp, getApps } from 'firebase/app';
-import {
-  getAuth,
-  initializeAuth,
-  browserLocalPersistence,
-  inMemoryPersistence,
-  connectAuthEmulator,
-} from 'firebase/auth';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import {
   getFirestore,
   initializeFirestore,
   persistentLocalCache,
-  persistentSingleTabManager,
+  persistentMultipleTabManager,
   memoryLocalCache,
   connectFirestoreEmulator,
 } from 'firebase/firestore';
@@ -27,19 +21,7 @@ const firebaseConfig = {
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-
-function createAuth() {
-  if (typeof window === 'undefined') return getAuth(app);
-  try {
-    return initializeAuth(app, {
-      persistence: [browserLocalPersistence, inMemoryPersistence],
-    });
-  } catch {
-    return getAuth(app);
-  }
-}
-
-export const auth = createAuth();
+export const auth = getAuth(app);
 
 function createFirestore() {
   if (getApps().length > 1 || typeof window === 'undefined') {
@@ -47,8 +29,9 @@ function createFirestore() {
   }
   try {
     return initializeFirestore(app, {
-      localCache: memoryLocalCache(),
-      experimentalAutoDetectLongPolling: true,
+      localCache: useEmulators
+        ? memoryLocalCache()
+        : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
     });
   } catch {
     return getFirestore(app);

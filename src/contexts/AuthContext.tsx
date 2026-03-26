@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import * as Sentry from '@sentry/nextjs';
 import { auth } from '@/lib/firebase/config';
 import {
   signIn,
@@ -44,18 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    function resolveLoading() {
-      setLoading(false);
-      if (typeof window !== 'undefined') (window as any).__slzReady = true;
-    }
-
-    const timeout = setTimeout(() => {
-      try {
-        Sentry.captureMessage('Auth initialization timed out', { level: 'error' });
-      } catch { /* must not prevent resolveLoading */ }
-      resolveLoading();
-    }, 10_000);
-
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
@@ -66,13 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .then((tokenResult) => {
             setIsAdmin(tokenResult.claims.admin === true);
           })
-          .catch((err) => {
-            Sentry.captureException(err);
+          .catch(() => {
             setIsAdmin(false);
-          })
-          .finally(() => {
-            clearTimeout(timeout);
-            resolveLoading();
           });
         if (!isAnon && hasNotificationAPI) {
           syncFcmToken(firebaseUser.uid);
@@ -80,14 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAdmin(false);
         setIsGuest(false);
-        clearTimeout(timeout);
-        resolveLoading();
       }
+      setLoading(false);
     });
-    return () => {
-      clearTimeout(timeout);
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   const refreshClaims = async () => {

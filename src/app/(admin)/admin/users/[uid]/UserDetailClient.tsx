@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Stack, Text, Group, ActionIcon, Card, Badge, Divider } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -13,10 +13,10 @@ import { subscribeToUser, getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import type { UserProfile } from '@/lib/types';
 
-export function UserDetailClient() {
-  const params = useParams();
+function UserDetailInner() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const uid = params.uid as string;
+  const uid = searchParams.get('uid') ?? '';
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -62,7 +62,7 @@ export function UserDetailClient() {
           <ActionIcon
             variant="subtle"
             aria-label="חזרה לרשימת משתמשים"
-            onClick={() => router.push('/admin/users')}
+            onClick={() => router.replace('/admin/users')}
           >
             <IconChevronRight size={20} />
           </ActionIcon>
@@ -119,5 +119,13 @@ export function UserDetailClient() {
         )}
       </Stack>
     </PageContainer>
+  );
+}
+
+export function UserDetailClient() {
+  return (
+    <Suspense>
+      <UserDetailInner />
+    </Suspense>
   );
 }

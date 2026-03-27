@@ -48,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (firebaseUser) {
         const isAnon = firebaseUser.isAnonymous;
         setIsGuest(isAnon);
+        // Wait for claims before releasing loading — admin layout guards on
+        // isAdmin and will redirect to /home if loading=false but isAdmin=false.
         firebaseUser
           .getIdTokenResult()
           .then((tokenResult) => {
@@ -55,6 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })
           .catch(() => {
             setIsAdmin(false);
+          })
+          .finally(() => {
+            setLoading(false);
           });
         if (!isAnon && hasNotificationAPI) {
           syncFcmToken(firebaseUser.uid);
@@ -62,8 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAdmin(false);
         setIsGuest(false);
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);

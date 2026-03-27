@@ -3,10 +3,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Static export is only needed for Firebase Hosting (production builds).
-  // In dev mode it breaks dynamic routes like /admin/users/[uid] because
-  // the dev server enforces generateStaticParams() for all navigations.
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  output: 'export',
   reactStrictMode: true,
   images: { unoptimized: true },
   experimental: {

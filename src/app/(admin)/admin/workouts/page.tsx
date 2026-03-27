@@ -16,10 +16,6 @@ function WorkoutsListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dateKeyParam = searchParams.get('dateKey');
-
-  if (dateKeyParam !== null) {
-    return <EditWorkoutClient />;
-  }
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -42,6 +38,10 @@ function WorkoutsListPage() {
   }, []);
 
   const todayKey = getTodayDateKey();
+
+  if (dateKeyParam !== null) {
+    return <EditWorkoutClient />;
+  }
 
   const handleDelete = async () => {
     if (!deleteTarget) return;

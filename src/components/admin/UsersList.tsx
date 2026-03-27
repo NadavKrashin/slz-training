@@ -63,7 +63,7 @@ export function UsersList() {
             <UnstyledButton
               key={u.uid}
               component="tr"
-              onClick={() => router.push(`/admin/users/${u.uid}`)}
+              onClick={() => router.push(`/admin/users?uid=${u.uid}`)}
               style={{ cursor: 'pointer' }}
             >
               <Table.Td>

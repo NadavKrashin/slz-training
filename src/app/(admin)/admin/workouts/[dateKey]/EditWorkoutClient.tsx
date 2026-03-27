@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Stack, Text, Group, ActionIcon, TextInput } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { WorkoutForm } from '@/components/admin/WorkoutForm';
 import { getHebrewDate, dateKeyToDate } from '@/lib/dates';
 
-export function EditWorkoutClient() {
-  const params = useParams();
+function EditWorkoutInner() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const dateKey = params.dateKey as string;
+  const dateKey = searchParams.get('dateKey') ?? '';
   const [overrideDateKey, setOverrideDateKey] = useState(dateKey);
 
   const getDescription = () => {
@@ -29,7 +29,7 @@ export function EditWorkoutClient() {
           <ActionIcon
             variant="subtle"
             aria-label="חזרה לרשימת אימונים"
-            onClick={() => router.push('/admin/workouts')}
+            onClick={() => router.replace('/admin/workouts')}
           >
             <IconChevronRight size={20} />
           </ActionIcon>
@@ -43,8 +43,16 @@ export function EditWorkoutClient() {
           onChange={(e) => setOverrideDateKey(e.currentTarget.value)}
           description={getDescription()}
         />
-        <WorkoutForm dateKey={overrideDateKey} onSaved={() => router.push('/admin/workouts')} />
+        <WorkoutForm dateKey={overrideDateKey} onSaved={() => router.replace('/admin/workouts')} />
       </Stack>
     </PageContainer>
+  );
+}
+
+export function EditWorkoutClient() {
+  return (
+    <Suspense>
+      <EditWorkoutInner />
+    </Suspense>
   );
 }

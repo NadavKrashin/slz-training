@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Stack, Text, Button, Group, Card, Badge, ActionIcon } from '@mantine/core';
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { EditWorkoutClient } from './[dateKey]/EditWorkoutClient';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { getWorkoutsInRange, deleteWorkout } from '@/lib/firebase/firestore';
@@ -11,8 +12,10 @@ import { getTodayDateKey, getHebrewDate, formatDateKey, dateKeyToDate } from '@/
 import { notifications } from '@mantine/notifications';
 import type { Workout } from '@/lib/types';
 
-export default function WorkoutsPage() {
+function WorkoutsListPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const dateKeyParam = searchParams.get('dateKey');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -36,6 +39,10 @@ export default function WorkoutsPage() {
 
   const todayKey = getTodayDateKey();
 
+  if (dateKeyParam !== null) {
+    return <EditWorkoutClient />;
+  }
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
@@ -57,7 +64,7 @@ export default function WorkoutsPage() {
           </Text>
           <Button
             leftSection={<IconPlus size={16} />}
-            onClick={() => router.push(`/admin/workouts/${todayKey}`)}
+            onClick={() => router.push(`/admin/workouts?dateKey=${todayKey}`)}
           >
             אימון חדש
           </Button>
@@ -91,7 +98,7 @@ export default function WorkoutsPage() {
                 <ActionIcon
                   variant="subtle"
                   aria-label="ערוך אימון"
-                  onClick={() => router.push(`/admin/workouts/${w.dateKey}`)}
+                  onClick={() => router.push(`/admin/workouts?dateKey=${w.dateKey}`)}
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
@@ -116,5 +123,13 @@ export default function WorkoutsPage() {
         message="למחוק את האימון? לא ניתן לבטל פעולה זו."
       />
     </PageContainer>
+  );
+}
+
+export default function WorkoutsPage() {
+  return (
+    <Suspense>
+      <WorkoutsListPage />
+    </Suspense>
   );
 }

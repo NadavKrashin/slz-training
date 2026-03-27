@@ -3,8 +3,6 @@ import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import {
   getFirestore,
   initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
   memoryLocalCache,
   connectFirestoreEmulator,
 } from 'firebase/firestore';
@@ -28,11 +26,7 @@ function createFirestore() {
     return getFirestore(app);
   }
   try {
-    return initializeFirestore(app, {
-      localCache: useEmulators
-        ? memoryLocalCache()
-        : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-    });
+    return initializeFirestore(app, { localCache: memoryLocalCache() });
   } catch {
     return getFirestore(app);
   }

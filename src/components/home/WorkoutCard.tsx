@@ -55,16 +55,15 @@ export function WorkoutCard({ workout, isCompleted }: WorkoutCardProps) {
         </Group>
         <Divider color="brand.1" />
         <StagesList stages={workout.stages} />
-        <Button
-          fullWidth
-          size="lg"
-          leftSection={isCompleted ? <IconCheck size={20} /> : <IconPlayerPlay size={20} />}
-          color={isCompleted ? 'green' : 'brand'}
-          variant="filled"
-          onClick={() => router.push('/workout')}
-        >
-          {isCompleted ? 'התחל שוב' : 'התחל אימון'}
-        </Button>
+        {isCompleted ? (
+          <Button fullWidth size="lg" leftSection={<IconCheck size={20} />} color="green" variant="filled" disabled>
+            האימון הושלם
+          </Button>
+        ) : (
+          <Button fullWidth size="lg" leftSection={<IconPlayerPlay size={20} />} color="brand" variant="filled" onClick={() => router.push('/workout')}>
+            התחל אימון
+          </Button>
+        )}
       </Stack>
     </Card>
   );

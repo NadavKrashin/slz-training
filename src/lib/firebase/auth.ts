@@ -12,6 +12,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from './config';
+import { deleteGuestAccountFn } from './functions';
 import { createUserProfile, createGuestProfile, upsertUserProfile } from './firestore';
 
 const googleProvider = new GoogleAuthProvider();
@@ -43,6 +44,12 @@ export async function resetPassword(email: string) {
 }
 
 export async function signOut() {
+  const user = auth.currentUser;
+  if (user?.isAnonymous) {
+    await deleteGuestAccountFn({});
+    // Auth account is deleted server-side; sign out the client session
+    return firebaseSignOut(auth);
+  }
   return firebaseSignOut(auth);
 }
 

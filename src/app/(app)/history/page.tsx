@@ -7,6 +7,7 @@ import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletions } from '@/hooks/useCompletions';
 import { useStreak } from '@/hooks/useStreak';
+import { useAllTimeStats } from '@/hooks/useAllTimeStats';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import { getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { NAV_HEIGHT } from '@/lib/constants';
@@ -18,6 +19,7 @@ export default function HistoryPage() {
   const { start, end } = getMonthRange(year, month);
   const { completions, loading } = useCompletions(start, end);
   const { currentStreak } = useStreak();
+  const { totalCompleted, totalPosted } = useAllTimeStats();
   const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -31,9 +33,6 @@ export default function HistoryPage() {
 
   const goNext = () => setCurrentMonth(new Date(year, month + 1, 1));
   const goPrev = () => setCurrentMonth(new Date(year, month - 1, 1));
-
-  const completed = Array.from(completions.values()).filter((c) => c.completed).length;
-  const total = workoutDates.size;
 
   return (
     <Box pb={NAV_HEIGHT + 24}>
@@ -77,9 +76,9 @@ export default function HistoryPage() {
                 workoutDates={workoutDates}
               />
               <MonthlySummary
-                completed={completed}
-                missed={total - completed}
-                total={total}
+                completed={totalCompleted}
+                missed={totalPosted - totalCompleted}
+                total={totalPosted}
                 streak={currentStreak}
               />
             </>

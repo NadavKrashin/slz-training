@@ -2,14 +2,17 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Stack, Text, Group, ActionIcon, Card, Badge, Divider } from '@mantine/core';
-import { IconChevronRight } from '@tabler/icons-react';
+import { Stack, Text, Group, ActionIcon, Card, Badge, Divider, Button } from '@mantine/core';
+import { IconChevronRight, IconShield, IconShieldOff } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletionsForUid } from '@/hooks/useCompletions';
+import { useUser } from '@/hooks/useUser';
 import { subscribeToUser, getWorkoutsInRange } from '@/lib/firebase/firestore';
+import { setAdminClaimFn, removeAdminClaimFn } from '@/lib/firebase/functions';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import type { UserProfile } from '@/lib/types';
 
@@ -19,6 +22,8 @@ function UserDetailInner() {
   const uid = searchParams.get('uid') ?? '';
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(false);
+  const { userData: currentUser } = useUser();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -47,6 +52,27 @@ function UserDetailInner() {
 
   const completed = Array.from(completions.values()).filter((c) => c.completed).length;
   const total = workoutDates.size;
+
+  const isSelf = currentUser?.uid === uid;
+  const isTargetAdmin = profile?.role === 'admin';
+
+  async function handleToggleRole() {
+    if (!profile) return;
+    setRoleLoading(true);
+    try {
+      if (isTargetAdmin) {
+        await removeAdminClaimFn({ targetUid: uid });
+        notifications.show({ message: `${profile.displayName} הוסר מתפקיד מנהל`, color: 'orange' });
+      } else {
+        await setAdminClaimFn({ targetUid: uid });
+        notifications.show({ message: `${profile.displayName} קודם למנהל`, color: 'green' });
+      }
+    } catch (err: any) {
+      notifications.show({ message: err?.message ?? 'שגיאה בשינוי הרשאות', color: 'red' });
+    } finally {
+      setRoleLoading(false);
+    }
+  }
 
   if (loading)
     return (
@@ -88,6 +114,18 @@ function UserDetailInner() {
                 </Text>
               </Text>
             </Group>
+            {!isSelf && profile?.role !== 'guest' && (
+              <Button
+                size="xs"
+                variant="light"
+                color={isTargetAdmin ? 'orange' : 'brand'}
+                leftSection={isTargetAdmin ? <IconShieldOff size={14} /> : <IconShield size={14} />}
+                loading={roleLoading}
+                onClick={handleToggleRole}
+              >
+                {isTargetAdmin ? 'הסר הרשאות מנהל' : 'הפוך למנהל'}
+              </Button>
+            )}
           </Stack>
         </Card>
         <Divider label="היסטוריית אימונים" />

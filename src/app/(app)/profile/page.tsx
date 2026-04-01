@@ -92,8 +92,17 @@ export default function ProfilePage() {
     try {
       await linkGuestToEmail(upgradeEmail.trim(), upgradePassword, upgradeDisplayName.trim());
       notifications.show({ title: 'שודרג', message: 'החשבון שודרג בהצלחה!', color: 'green' });
-    } catch {
-      setUpgradeError('שדרוג החשבון נכשל. ייתכן שהאימייל כבר בשימוש.');
+    } catch (err: any) {
+      if (err?.code === 'auth/weak-password') {
+        setUpgradeError('הסיסמה חלשה מדי. נדרשים לפחות 6 תווים.');
+      } else if (
+        err?.code === 'auth/email-already-in-use' ||
+        err?.code === 'auth/credential-already-in-use'
+      ) {
+        setUpgradeError('האימייל הזה כבר בשימוש על ידי חשבון אחר.');
+      } else {
+        setUpgradeError('שדרוג החשבון נכשל. אנא נסה שוב.');
+      }
     } finally {
       setUpgradeLoading(false);
     }

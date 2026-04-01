@@ -93,10 +93,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await signInAsGuest();
     },
     linkGuestToEmail: async (email, password, displayName) => {
-      await linkGuestToEmail(email, password, displayName);
+      const result = await linkGuestToEmail(email, password, displayName);
+      setUser(result.user);
+      setIsGuest(false);
     },
     linkGuestToGoogle: async () => {
-      await linkGuestToGoogle();
+      const result = await linkGuestToGoogle();
+      setUser(result.user);
+      setIsGuest(false);
     },
     resetPassword: async (email) => {
       await resetPassword(email);

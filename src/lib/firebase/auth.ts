@@ -69,7 +69,11 @@ export async function linkGuestToEmail(email: string, password: string, displayN
   const credential = EmailAuthProvider.credential(email, password);
   const result = await linkWithCredential(auth.currentUser, credential);
   await updateProfile(result.user, { displayName });
-  await upsertUserProfile(result.user.uid, { email, displayName });
+  try {
+    await upsertUserProfile(result.user.uid, { email, displayName });
+  } catch (err) {
+    console.error('upsertUserProfile failed after successful link:', err);
+  }
   return result;
 }
 
@@ -77,10 +81,14 @@ export async function linkGuestToGoogle() {
   if (!auth.currentUser) throw new Error('Not authenticated');
   const result = await linkWithPopup(auth.currentUser, googleProvider);
   const { uid, email, displayName, photoURL } = result.user;
-  await upsertUserProfile(uid, {
-    email: email ?? '',
-    displayName: displayName ?? '',
-    photoURL: photoURL ?? '',
-  });
+  try {
+    await upsertUserProfile(uid, {
+      email: email ?? '',
+      displayName: displayName ?? '',
+      photoURL: photoURL ?? '',
+    });
+  } catch (err) {
+    console.error('upsertUserProfile failed after successful link:', err);
+  }
   return result;
 }

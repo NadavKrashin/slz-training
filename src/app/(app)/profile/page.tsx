@@ -131,8 +131,14 @@ export default function ProfilePage() {
       >
         <Container size="sm">
           <Group justify="center" gap="md">
-            <ThemeIcon size={48} radius="xl" color="white" variant="filled" c="brand.6">
-              <IconUser size={24} />
+            <ThemeIcon size={56} radius="xl" color="white" variant="filled" c="brand.6">
+              {isGuest ? (
+                <IconUser size={28} />
+              ) : (
+                <Text size="xl" fw={700} c="brand.6">
+                  {(userData?.displayName || '?').charAt(0)}
+                </Text>
+              )}
             </ThemeIcon>
             <Stack gap={0}>
               <Text size="md" fw={700} c="white">

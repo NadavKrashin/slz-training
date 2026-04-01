@@ -6,6 +6,7 @@ import { Box } from '@mantine/core';
 import { useAuth } from '@/contexts/AuthContext';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { PageTransition } from '@/components/ui/PageTransition';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
@@ -50,7 +51,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <Box pb={hideNav ? 0 : NAV_HEIGHT}>{children}</Box>
+      <Box pb={hideNav ? 0 : NAV_HEIGHT}>
+        <PageTransition key={pathname}>{children}</PageTransition>
+      </Box>
       {!hideNav && <BottomNav />}
     </>
   );

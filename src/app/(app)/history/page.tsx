@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Stack, Text, Box, Container } from '@mantine/core';
+import { Stack, Text, Box, Container, Skeleton } from '@mantine/core';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
@@ -64,9 +64,10 @@ export default function HistoryPage() {
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
           {loading ? (
-            <Text c="dimmed" ta="center">
-              טוען...
-            </Text>
+            <>
+              <Skeleton h={240} radius="lg" />
+              <Skeleton h={100} radius="lg" />
+            </>
           ) : (
             <>
               <CalendarGrid

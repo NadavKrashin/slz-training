@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { Stack, Text, Button, Group, Card, Badge, ActionIcon } from '@mantine/core';
+import { Stack, Text, Button, Group, Card, Badge, ActionIcon, Skeleton } from '@mantine/core';
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EditWorkoutClient } from './[dateKey]/EditWorkoutClient';
@@ -69,7 +69,13 @@ function WorkoutsListPage() {
             אימון חדש
           </Button>
         </Group>
-        {loading && <Text c="dimmed">טוען...</Text>}
+        {loading && (
+          <Stack gap="sm">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} h={80} radius="lg" />
+            ))}
+          </Stack>
+        )}
         {!loading && workouts.length === 0 && (
           <Text c="dimmed" ta="center">
             אין אימונים

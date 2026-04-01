@@ -26,7 +26,17 @@ export default function TimerPage() {
             </Text>
           </Stack>
           {loading ? (
-            <Text c="rgba(255,255,255,0.7)">טוען...</Text>
+            <Box style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
+              <Box
+                style={{
+                  display: 'flex',
+                  borderRadius: 'var(--mantine-radius-xl)',
+                  background: 'rgba(255,255,255,0.1)',
+                  overflow: 'hidden',
+                  height: 100,
+                }}
+              />
+            </Box>
           ) : hasTarget ? (
             <CountdownTimer days={days} hours={hours} minutes={minutes} seconds={seconds} />
           ) : (

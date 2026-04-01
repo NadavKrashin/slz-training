@@ -1,7 +1,7 @@
 export const APP_TIMEZONE = 'Asia/Jerusalem';
 export const WORKOUT_DURATION_SECONDS = 600;
 export const HEBREW_DAYS_SHORT = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
-export const NAV_HEIGHT = 70;
+export const NAV_HEIGHT = 64;
 
 export const MOTIVATIONAL_MESSAGES_SEED = [
   'אתה יכול הכל! תאמין בעצמך 💪',

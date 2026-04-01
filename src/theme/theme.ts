@@ -1,11 +1,11 @@
 'use client';
 
 import { createTheme } from '@mantine/core';
-import { brandBlue } from './colors';
+import { brandBlue, warmOrange } from './colors';
 
 export const theme = createTheme({
   primaryColor: 'brand',
-  colors: { brand: brandBlue },
+  colors: { brand: brandBlue, warm: warmOrange },
   fontFamily: "'Heebo', sans-serif",
   headings: { fontFamily: "'Heebo', sans-serif" },
   defaultRadius: 'md',
@@ -15,15 +15,19 @@ export const theme = createTheme({
     Button: {
       defaultProps: { radius: 'xl' },
       styles: {
-        root: { fontWeight: 600 },
+        root: {
+          fontWeight: 600,
+          transition: 'background 0.2s, box-shadow 0.2s, transform 0.15s',
+        },
       },
     },
     Card: {
-      defaultProps: { radius: 'lg', shadow: 'sm', padding: 'lg' },
+      defaultProps: { radius: 'lg', shadow: 'none', padding: 'lg' },
       styles: {
         root: {
-          border: 'none',
-          boxShadow: '0 2px 12px rgba(76, 110, 245, 0.08)',
+          border: '1px solid var(--mantine-color-gray-2)',
+          boxShadow: '0 1px 8px rgba(0, 0, 0, 0.04)',
+          transition: 'box-shadow 0.2s, transform 0.15s',
         },
       },
     },

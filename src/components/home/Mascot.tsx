@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Text, Stack, Group } from '@mantine/core';
+import { motion } from 'framer-motion';
 
 interface MascotProps {
   isCompleted: boolean;
@@ -18,7 +19,13 @@ export function Mascot({ isCompleted, message }: MascotProps) {
       }}
     >
       <Group align="center" gap="md">
-        <Text style={{ fontSize: 48, lineHeight: 1 }}>{isCompleted ? '🎉' : '💪'}</Text>
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
+        >
+          <Text style={{ fontSize: 48, lineHeight: 1 }}>{isCompleted ? '🎉' : '💪'}</Text>
+        </motion.div>
         <Stack gap={2} style={{ flex: 1 }}>
           <Text size="sm" fw={700} c="white">
             {isCompleted ? 'כל הכבוד! סיימת את האימון!' : 'בוא נתאמן היום!'}

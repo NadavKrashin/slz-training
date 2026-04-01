@@ -1,9 +1,11 @@
 'use client';
 
 import { Stack, Text, Box, Container } from '@mantine/core';
+import { IconBarbell } from '@tabler/icons-react';
 import { WorkoutCard } from '@/components/home/WorkoutCard';
 import { StreakBadge } from '@/components/home/StreakBadge';
 import { Mascot } from '@/components/home/Mascot';
+import { HomeSkeleton } from '@/components/ui/Skeletons';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { useUser } from '@/hooks/useUser';
 import { useTodayWorkout } from '@/hooks/useTodayWorkout';
@@ -19,6 +21,8 @@ export default function HomePage() {
   const { isCompleted } = useWorkoutCompletion(dateKey);
   const { currentStreak } = useStreak();
   const { message } = useMotivationalMessage();
+
+  if (workoutLoading) return <HomeSkeleton />;
 
   return (
     <Box pb={NAV_HEIGHT + 24}>
@@ -46,21 +50,23 @@ export default function HomePage() {
       {/* Content below, clean spacing */}
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
-          {workout && !workoutLoading && (
+          {workout ? (
             <WorkoutCard workout={workout} isCompleted={isCompleted} />
-          )}
-          {!workout && !workoutLoading && (
+          ) : (
             <Box
               p="xl"
               ta="center"
               style={{
                 borderRadius: 'var(--mantine-radius-lg)',
-                background: '#f0f2ff',
+                background: 'var(--mantine-color-gray-0)',
               }}
             >
-              <Text c="brand.6" fw={500}>
-                אין אימון מוגדר להיום
-              </Text>
+              <Stack align="center" gap="xs">
+                <IconBarbell size={32} color="var(--mantine-color-gray-4)" stroke={1.5} />
+                <Text c="dimmed" fw={500}>
+                  אין אימון מוגדר להיום
+                </Text>
+              </Stack>
             </Box>
           )}
         </Stack>

@@ -6,6 +6,7 @@ import { Stack, Text, Group, ActionIcon, Card, Badge, Divider, Button, Box, Cont
 import { IconChevronRight, IconShield, IconShieldOff, IconLock } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { UserDetailSkeleton } from '@/components/ui/Skeletons';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
@@ -86,7 +87,7 @@ function UserDetailInner() {
   if (loading)
     return (
       <PageContainer>
-        <Text c="dimmed">טוען...</Text>
+        <UserDetailSkeleton />
       </PageContainer>
     );
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { Card, Group, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Group, Stack, Text, ThemeIcon, Card } from '@mantine/core';
 import { IconCheck, IconFlame, IconChartBar } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
 
 interface MonthlySummaryProps {
   completed: number;
@@ -10,45 +11,45 @@ interface MonthlySummaryProps {
   streak: number;
 }
 
+const item = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 },
+};
+
 export function MonthlySummary({ completed, total, streak }: MonthlySummaryProps) {
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const stats = [
+    { value: completed, label: 'הושלמו', icon: IconCheck, color: 'green' },
+    { value: streak, label: 'רצף נוכחי', icon: IconFlame, color: 'orange' },
+    { value: `${percentage}%`, label: 'הצלחה', icon: IconChartBar, color: 'brand' },
+  ];
+
   return (
-    <Card style={{ background: 'linear-gradient(135deg, #4c6ef5 0%, #748ffc 100%)' }}>
-      <Group justify="space-around">
-        <Stack align="center" gap={4}>
-          <ThemeIcon size={40} radius="xl" color="white" variant="filled" c="brand.6">
-            <IconCheck size={22} />
-          </ThemeIcon>
-          <Text size="xl" fw={700} c="white">
-            {completed}
-          </Text>
-          <Text size="xs" c="rgba(255,255,255,0.7)">
-            הושלמו
-          </Text>
-        </Stack>
-        <Stack align="center" gap={4}>
-          <ThemeIcon size={40} radius="xl" color="white" variant="filled" c="orange.6">
-            <IconFlame size={22} />
-          </ThemeIcon>
-          <Text size="xl" fw={700} c="white">
-            {streak}
-          </Text>
-          <Text size="xs" c="rgba(255,255,255,0.7)">
-            רצף נוכחי
-          </Text>
-        </Stack>
-        <Stack align="center" gap={4}>
-          <ThemeIcon size={40} radius="xl" color="white" variant="filled" c="brand.6">
-            <IconChartBar size={22} />
-          </ThemeIcon>
-          <Text size="xl" fw={700} c="white">
-            {percentage}%
-          </Text>
-          <Text size="xs" c="rgba(255,255,255,0.7)">
-            הצלחה
-          </Text>
-        </Stack>
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.06 } } }}
+    >
+      <Group grow gap="sm">
+        {stats.map((s) => (
+          <motion.div key={s.label} variants={item}>
+            <Card padding="sm">
+              <Stack align="center" gap={6}>
+                <ThemeIcon size={36} variant="light" color={s.color}>
+                  <s.icon size={20} />
+                </ThemeIcon>
+                <Text size="xl" fw={700}>
+                  {s.value}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {s.label}
+                </Text>
+              </Stack>
+            </Card>
+          </motion.div>
+        ))}
       </Group>
-    </Card>
+    </motion.div>
   );
 }

@@ -1,45 +1,54 @@
 'use client';
 
-import { Stack, Text, SimpleGrid, Card, ThemeIcon } from '@mantine/core';
-import { IconBarbell, IconUsers, IconCalendar, IconMessage, IconClock } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
+import { Stack, Text, Divider } from '@mantine/core';
 import { PageContainer } from '@/components/layout/PageContainer';
-
-const links = [
-  { href: '/admin/workouts', label: 'אימונים', icon: IconBarbell, color: 'brand' },
-  { href: '/admin/users', label: 'משתמשים', icon: IconUsers, color: 'green' },
-  { href: '/admin/daily', label: 'סקירה יומית', icon: IconCalendar, color: 'orange' },
-  { href: '/admin/messages', label: 'הודעות', icon: IconMessage, color: 'violet' },
-  { href: '/admin/timer', label: 'טיימר', icon: IconClock, color: 'red' },
-];
+import { StatCards } from '@/components/admin/dashboard/StatCards';
+import { TodayBanner } from '@/components/admin/dashboard/TodayBanner';
+import { WeeklyTrend } from '@/components/admin/dashboard/WeeklyTrend';
+import { Leaderboard } from '@/components/admin/dashboard/Leaderboard';
+import { useAdminDashboardStats } from '@/hooks/useAdminDashboardStats';
 
 export default function AdminDashboard() {
-  const router = useRouter();
+  const stats = useAdminDashboardStats();
+
+  if (stats.loading) {
+    return (
+      <PageContainer>
+        <Text c="dimmed" ta="center">
+          טוען...
+        </Text>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
       <Stack gap="lg">
         <Text size="xl" fw={700} ta="center">
-          ניהול
+          לוח בקרה
         </Text>
-        <SimpleGrid cols={2} spacing="md">
-          {links.map(({ href, label, icon: Icon, color }) => (
-            <Card
-              key={href}
-              padding="lg"
-              withBorder
-              style={{ cursor: 'pointer' }}
-              onClick={() => router.push(href)}
-            >
-              <Stack align="center" gap="sm">
-                <ThemeIcon size="xl" variant="light" color={color} radius="xl">
-                  <Icon size={24} />
-                </ThemeIcon>
-                <Text fw={500}>{label}</Text>
-              </Stack>
-            </Card>
-          ))}
-        </SimpleGrid>
+
+        <StatCards
+          sharingCount={stats.sharingCount}
+          totalEligibleCount={stats.totalEligibleCount}
+          todayCompletedCount={stats.todayCompletedCount}
+          todayTotal={stats.sharingCount}
+          hasWorkoutToday={stats.todayWorkout !== null}
+          allTimeCompletionPercent={stats.allTimeCompletionPercent}
+          averageStreak={stats.averageStreak}
+        />
+
+        <TodayBanner
+          todayWorkout={stats.todayWorkout}
+          completedCount={stats.todayCompletedCount}
+          sharingCount={stats.sharingCount}
+        />
+
+        <Divider label="מגמה שבועית" />
+        <WeeklyTrend trend={stats.weeklyTrend} />
+
+        <Divider label="טבלת מצטיינים" />
+        <Leaderboard entries={stats.leaderboard} />
       </Stack>
     </PageContainer>
   );

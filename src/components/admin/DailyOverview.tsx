@@ -4,31 +4,41 @@ import { useEffect, useState } from 'react';
 import { Stack, Group, Text, Card, Badge, Table, ThemeIcon } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { getTodayDateKey, getHebrewDate } from '@/lib/dates';
-import { getCompletionsForDate, getAllUsers, getWorkout } from '@/lib/firebase/firestore';
-import type { WorkoutCompletion, UserProfile, Workout } from '@/lib/types';
+import { getAllCompletionsForUser, getAllUsers, getWorkout } from '@/lib/firebase/firestore';
+import type { UserProfile, Workout } from '@/lib/types';
 
 export function DailyOverview() {
   const [dateKey] = useState(getTodayDateKey);
-  const [completions, setCompletions] = useState<WorkoutCompletion[]>([]);
+  const [completedUids, setCompletedUids] = useState<Set<string>>(new Set());
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getCompletionsForDate(dateKey), getAllUsers(), getWorkout(dateKey)]).then(
-      ([c, u, w]) => {
-        setCompletions(c);
-        setUsers(u);
-        setWorkout(w);
-        setLoading(false);
-      }
-    );
+    async function load() {
+      const [allUsers, w] = await Promise.all([getAllUsers(), getWorkout(dateKey)]);
+      const sharing = allUsers.filter((u) => u.shareCompletionWithAdmin && u.role !== 'admin');
+      // Query completions per sharing user to satisfy security rules
+      const perUserComps = await Promise.all(
+        sharing.map((u) => getAllCompletionsForUser(u.uid, dateKey))
+      );
+      const uidsCompleted = new Set<string>();
+      perUserComps.forEach((comps, i) => {
+        if (comps.some((c) => c.dateKey === dateKey && c.completed)) {
+          uidsCompleted.add(sharing[i].uid);
+        }
+      });
+      setUsers(allUsers);
+      setWorkout(w);
+      setCompletedUids(uidsCompleted);
+      setLoading(false);
+    }
+    load();
   }, [dateKey]);
 
   if (loading) return <Text c="dimmed">טוען...</Text>;
 
   const sharingUsers = users.filter((u) => u.shareCompletionWithAdmin && u.role !== 'admin');
-  const completedUids = new Set(completions.map((c) => c.uid));
   const completedCount = sharingUsers.filter((u) => completedUids.has(u.uid)).length;
 
   return (

@@ -2,14 +2,16 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Stack, Text, Group, ActionIcon, Card, Badge, Divider, Button } from '@mantine/core';
-import { IconChevronRight, IconShield, IconShieldOff } from '@tabler/icons-react';
+import { Stack, Text, Group, ActionIcon, Card, Badge, Divider, Button, Box, Container } from '@mantine/core';
+import { IconChevronRight, IconShield, IconShieldOff, IconLock } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletionsForUid } from '@/hooks/useCompletions';
+import { useAllTimeStatsForUid } from '@/hooks/useAllTimeStatsForUid';
+import { useStreakForUid } from '@/hooks/useStreakForUid';
 import { useUser } from '@/hooks/useUser';
 import { subscribeToUser, getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { setAdminClaimFn, removeAdminClaimFn } from '@/lib/firebase/functions';
@@ -28,7 +30,16 @@ function UserDetailInner() {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const { start, end } = getMonthRange(year, month);
-  const { completions, loading: compLoading } = useCompletionsForUid(uid, start, end);
+
+  const sharesData = profile?.shareCompletionWithAdmin ?? false;
+
+  const { completions, loading: compLoading } = useCompletionsForUid(
+    sharesData ? uid : '',
+    start,
+    end
+  );
+  const { totalCompleted, totalPosted } = useAllTimeStatsForUid(sharesData ? uid : '');
+  const { currentStreak } = useStreakForUid(sharesData ? uid : '');
   const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -40,18 +51,16 @@ function UserDetailInner() {
   }, [uid]);
 
   useEffect(() => {
+    if (!sharesData) return;
     getWorkoutsInRange(start, end).then((ws) => {
       setWorkoutDates(new Set(ws.map((w) => w.dateKey)));
     });
-  }, [start, end]);
+  }, [sharesData, start, end]);
 
   const todayKey = getTodayDateKey();
   const canGoNext = `${year}-${String(month + 2).padStart(2, '0')}` <= todayKey.slice(0, 7);
   const goNext = () => setCurrentMonth(new Date(year, month + 1, 1));
   const goPrev = () => setCurrentMonth(new Date(year, month - 1, 1));
-
-  const completed = Array.from(completions.values()).filter((c) => c.completed).length;
-  const total = workoutDates.size;
 
   const isSelf = currentUser?.uid === uid;
   const isTargetAdmin = profile?.role === 'admin';
@@ -96,6 +105,7 @@ function UserDetailInner() {
             {profile?.displayName}
           </Text>
         </Group>
+
         <Card>
           <Stack gap="xs">
             <Group justify="space-between">
@@ -128,31 +138,58 @@ function UserDetailInner() {
             )}
           </Stack>
         </Card>
+
         <Divider label="היסטוריית אימונים" />
-        <MonthNavigator
-          label={getHebrewMonthYear(currentMonth)}
-          onPrev={goPrev}
-          onNext={goNext}
-          canGoNext={canGoNext}
-        />
-        {compLoading ? (
-          <Text c="dimmed" ta="center">
-            טוען...
-          </Text>
+
+        {!sharesData ? (
+          <Card>
+            <Stack align="center" gap="xs" py="md">
+              <IconLock size={32} color="gray" />
+              <Text c="dimmed" ta="center">
+                משתמש זה לא שיתף את נתוני האימונים שלו
+              </Text>
+            </Stack>
+          </Card>
         ) : (
           <>
-            <CalendarGrid
-              year={year}
-              month={month}
-              completions={completions}
-              workoutDates={workoutDates}
-            />
-            <MonthlySummary
-              completed={completed}
-              missed={total - completed}
-              total={total}
-              streak={0}
-            />
+            <Box
+              style={{
+                background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
+                borderRadius: 16,
+              }}
+              px="md"
+              py="md"
+            >
+              <Container size="sm" p={0}>
+                <MonthNavigator
+                  label={getHebrewMonthYear(currentMonth)}
+                  onPrev={goPrev}
+                  onNext={goNext}
+                  canGoNext={canGoNext}
+                />
+              </Container>
+            </Box>
+
+            {compLoading ? (
+              <Text c="dimmed" ta="center">
+                טוען...
+              </Text>
+            ) : (
+              <>
+                <CalendarGrid
+                  year={year}
+                  month={month}
+                  completions={completions}
+                  workoutDates={workoutDates}
+                />
+                <MonthlySummary
+                  completed={totalCompleted}
+                  missed={totalPosted - totalCompleted}
+                  total={totalPosted}
+                  streak={currentStreak}
+                />
+              </>
+            )}
           </>
         )}
       </Stack>

@@ -1,7 +1,8 @@
 'use client';
 
-import { Stack, Text } from '@mantine/core';
+import { Stack, Text, Divider } from '@mantine/core';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PushNotificationForm } from '@/components/admin/PushNotificationForm';
 import { MessagesList } from '@/components/admin/MessagesList';
 
 export default function MessagesPage() {
@@ -9,8 +10,10 @@ export default function MessagesPage() {
     <PageContainer>
       <Stack gap="lg">
         <Text size="xl" fw={700} ta="center">
-          הודעות מוטיבציה
+          הודעות
         </Text>
+        <PushNotificationForm />
+        <Divider label="הודעות מוטיבציה" labelPosition="right" />
         <MessagesList />
       </Stack>
     </PageContainer>

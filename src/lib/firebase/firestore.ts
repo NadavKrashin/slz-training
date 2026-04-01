@@ -13,6 +13,7 @@ import {
   Timestamp,
   serverTimestamp,
   Unsubscribe,
+  limit,
 } from 'firebase/firestore';
 import { db } from './config';
 import type {
@@ -285,3 +286,29 @@ export async function saveMessage(id: string | null, text: string, active: boole
 export async function deleteMessage(id: string) {
   return deleteDoc(doc(db, 'motivationalMessages', id));
 }
+
+export interface NotificationLog {
+  id: string;
+  type: 'manual' | 'scheduled';
+  title?: string;
+  body?: string;
+  audience?: 'all' | 'not_completed_today' | 'completed_today';
+  sentBy?: string;
+  sentAt: Timestamp;
+  targetedCount: number;
+  successCount: number;
+  failureCount: number;
+  staleTokensCleaned: number;
+}
+
+export async function getRecentManualNotificationLogs(count = 10): Promise<NotificationLog[]> {
+  const q = query(
+    collection(db, 'notificationLogs'),
+    where('type', '==', 'manual'),
+    orderBy('sentAt', 'desc'),
+    limit(count)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ ...d.data(), id: d.id }) as NotificationLog);
+}
+

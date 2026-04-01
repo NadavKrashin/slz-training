@@ -72,5 +72,11 @@ service cloud.firestore {
       allow read: if isAuth();
       allow write: if isAdmin();
     }
+
+    // Notification logs (written by Cloud Functions via admin SDK)
+    match /notificationLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
   }
 }

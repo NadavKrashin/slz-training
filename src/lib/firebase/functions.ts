@@ -27,3 +27,8 @@ export const deleteGuestAccountFn = httpsCallable<Record<string, never>, { succe
   functions,
   'deleteGuestAccount'
 );
+
+export const sendCustomPushFn = httpsCallable<
+  { title: string; body: string; audience: 'all' | 'not_completed_today' | 'completed_today' },
+  { sentCount: number; failureCount: number }
+>(functions, 'sendCustomPush');

@@ -242,6 +242,15 @@ export async function getAllCompletionsForUser(uid: string, end: string): Promis
   return snap.docs.map((d) => d.data() as WorkoutCompletion);
 }
 
+export async function getAllCompletionsUpTo(end: string): Promise<WorkoutCompletion[]> {
+  const q = query(
+    collection(db, 'workoutCompletions'),
+    where('dateKey', '<=', end)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as WorkoutCompletion);
+}
+
 export async function getCompletionsForDate(dateKey: string): Promise<WorkoutCompletion[]> {
   const q = query(
     collection(db, 'workoutCompletions'),

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Stack, Group, Text, Card, Badge, Table, ThemeIcon } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { getTodayDateKey, getHebrewDate } from '@/lib/dates';
-import { getAllCompletionsForUser, getAllUsers, getWorkout } from '@/lib/firebase/firestore';
+import { getAllUsers, getWorkout, getCompletionsForDate } from '@/lib/firebase/firestore';
 import type { UserProfile, Workout } from '@/lib/types';
 
 export function DailyOverview() {
@@ -16,18 +16,12 @@ export function DailyOverview() {
 
   useEffect(() => {
     async function load() {
-      const [allUsers, w] = await Promise.all([getAllUsers(), getWorkout(dateKey)]);
-      const sharing = allUsers.filter((u) => u.shareCompletionWithAdmin && u.role !== 'admin');
-      // Query completions per sharing user to satisfy security rules
-      const perUserComps = await Promise.all(
-        sharing.map((u) => getAllCompletionsForUser(u.uid, dateKey))
-      );
-      const uidsCompleted = new Set<string>();
-      perUserComps.forEach((comps, i) => {
-        if (comps.some((c) => c.dateKey === dateKey && c.completed)) {
-          uidsCompleted.add(sharing[i].uid);
-        }
-      });
+      const [allUsers, w, todayCompletions] = await Promise.all([
+        getAllUsers(),
+        getWorkout(dateKey),
+        getCompletionsForDate(dateKey),
+      ]);
+      const uidsCompleted = new Set(todayCompletions.map((c) => c.uid));
       setUsers(allUsers);
       setWorkout(w);
       setCompletedUids(uidsCompleted);

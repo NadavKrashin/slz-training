@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAllUsers, getAllWorkoutsUpTo, getAllCompletionsForUser, getWorkout } from '@/lib/firebase/firestore';
+import { getAllUsers, getAllWorkoutsUpTo, getAllCompletionsUpTo, getWorkout } from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
 import type { Workout, WorkoutCompletion } from '@/lib/types';
 
@@ -78,10 +78,11 @@ export function useAdminDashboardStats(): AdminDashboardStats {
     async function load() {
       const today = getTodayDateKey();
 
-      const [allUsers, allWorkouts, todayWorkout] = await Promise.all([
+      const [allUsers, allWorkouts, todayWorkout, allCompletions] = await Promise.all([
         getAllUsers(),
         getAllWorkoutsUpTo(today),
         getWorkout(today),
+        getAllCompletionsUpTo(today),
       ]);
 
       const sharingUsers = allUsers.filter(
@@ -101,10 +102,13 @@ export function useAdminDashboardStats(): AdminDashboardStats {
         cursor7.setDate(cursor7.getDate() - 1);
       }
 
-      // Fetch all completions per sharing user in parallel
-      const completionsByUser = await Promise.all(
-        sharingUsers.map((u) => getAllCompletionsForUser(u.uid, today))
-      );
+      // Group completions by uid
+      const completionsByUid = new Map<string, typeof allCompletions>();
+      for (const c of allCompletions) {
+        if (!completionsByUid.has(c.uid)) completionsByUid.set(c.uid, []);
+        completionsByUid.get(c.uid)!.push(c);
+      }
+      const completionsByUser = sharingUsers.map((u) => completionsByUid.get(u.uid) ?? []);
 
       // Build per-user stats
       const leaderboard: LeaderboardEntry[] = sharingUsers.map((u, i) => {

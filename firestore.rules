@@ -50,6 +50,7 @@ service cloud.firestore {
     // - uid field allows collection queries (history/streak) to pass rules.
     match /workoutCompletions/{docId} {
       allow read: if isAuth() && (
+        isAdmin() ||
         resource.data.uid == request.auth.uid ||
         docId.matches(request.auth.uid + '_.+') ||
         sharesWithAdmin(resource.data.uid)

@@ -20,8 +20,7 @@ import {
 import { IconUser, IconAlertCircle, IconInfoCircle } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUser } from '@/hooks/useUser';
-import { useStreak } from '@/hooks/useStreak';
+import { useAppData } from '@/contexts/AppDataContext';
 import { useUserLeaderboard } from '@/hooks/useUserLeaderboard';
 import { requestNotificationPermission } from '@/lib/firebase/messaging';
 import { hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
@@ -39,10 +38,8 @@ export default function ProfilePage() {
     linkGuestToEmail,
     linkGuestToGoogle,
   } = useAuth();
-  const { userData, updateProfile } = useUser();
-  const { currentStreak } = useStreak();
+  const { userData, currentStreak, updateProfile } = useAppData();
   const isSharing = userData?.shareCompletionWithAdmin ?? false;
-  // Only fetch leaderboard once we know the user is sharing (userData loaded + sharing on)
   const { entries: leaderboardEntries, loading: leaderboardLoading } = useUserLeaderboard(
     userData !== null && isSharing
   );

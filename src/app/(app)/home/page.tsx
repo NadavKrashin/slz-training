@@ -5,28 +5,14 @@ import { IconBarbell } from '@tabler/icons-react';
 import { WorkoutCard } from '@/components/home/WorkoutCard';
 import { StreakBadge } from '@/components/home/StreakBadge';
 import { Mascot } from '@/components/home/Mascot';
-import { HomeSkeleton } from '@/components/ui/Skeletons';
 import { NAV_HEIGHT } from '@/lib/constants';
-import { useUser } from '@/hooks/useUser';
-import { useTodayWorkout } from '@/hooks/useTodayWorkout';
-import { useWorkoutCompletion } from '@/hooks/useWorkoutCompletion';
-import { useStreak } from '@/hooks/useStreak';
-import { useMotivationalMessage } from '@/hooks/useMotivationalMessage';
-import { getTodayDateKey } from '@/lib/dates';
+import { useAppData } from '@/contexts/AppDataContext';
 
 export default function HomePage() {
-  const { userData } = useUser();
-  const { workout, loading: workoutLoading } = useTodayWorkout();
-  const dateKey = getTodayDateKey();
-  const { isCompleted } = useWorkoutCompletion(dateKey);
-  const { currentStreak } = useStreak();
-  const { message } = useMotivationalMessage();
-
-  if (workoutLoading) return <HomeSkeleton />;
+  const { userData, todayWorkout, isCompleted, currentStreak, motivationalMessage } = useAppData();
 
   return (
     <Box pb={NAV_HEIGHT + 24}>
-      {/* Unified hero: greeting + mascot + streak all inside one gradient */}
       <Box
         style={{
           background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
@@ -41,17 +27,16 @@ export default function HomePage() {
             <Text size="lg" fw={700} c="white" ta="center">
               שלום, {userData?.displayName || 'חבר/ה'} 👋
             </Text>
-            <Mascot isCompleted={isCompleted} message={message} />
+            <Mascot isCompleted={isCompleted} message={motivationalMessage} />
             <StreakBadge streak={currentStreak} />
           </Stack>
         </Container>
       </Box>
 
-      {/* Content below, clean spacing */}
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
-          {workout ? (
-            <WorkoutCard workout={workout} isCompleted={isCompleted} />
+          {todayWorkout ? (
+            <WorkoutCard workout={todayWorkout} isCompleted={isCompleted} />
           ) : (
             <Box
               p="xl"

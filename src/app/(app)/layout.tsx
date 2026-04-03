@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Box } from '@mantine/core';
 import { useAuth } from '@/contexts/AuthContext';
+import { AppDataProvider, useAppData } from '@/contexts/AppDataContext';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageTransition } from '@/components/ui/PageTransition';
@@ -41,16 +42,16 @@ if (typeof window !== 'undefined') {
   };
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isAdmin } = useAuth();
+function AppLayoutInner({ children }: { children: React.ReactNode }) {
+  const { isAdmin } = useAuth();
+  const { loading: dataLoading } = useAppData();
   const router = useRouter();
   const pathname = usePathname();
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const hiddenAt = useRef<number | null>(null);
 
-  // Reload the page if it has been in the background for a while so iOS PWA
-  // always picks up the latest deployed code.
+  // Reload after 30 min in background so iOS PWA always picks up latest code.
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
@@ -69,7 +70,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const x = e.touches[0].clientX;
-    // Ignore swipes that start near the screen edge (iOS back/forward gesture zone)
     if (x < SWIPE_EDGE_GUARD || x > window.innerWidth - SWIPE_EDGE_GUARD) return;
     touchStartX.current = x;
     touchStartY.current = e.touches[0].clientY;
@@ -82,7 +82,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     touchStartX.current = null;
     touchStartY.current = null;
 
-    // Ignore if vertical movement dominates (user is scrolling)
     if (Math.abs(dy) > Math.abs(dx)) return;
     if (Math.abs(dx) < SWIPE_MIN_X) return;
 
@@ -90,18 +89,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const currentIndex = paths.findIndex((p) => pathname.startsWith(p));
     if (currentIndex === -1) return;
 
-    // Swipe right → next tab, swipe left → previous tab
     const nextIndex = dx > 0 ? currentIndex + 1 : currentIndex - 1;
     if (nextIndex < 0 || nextIndex >= paths.length) return;
     router.push(paths[nextIndex]);
   }, [pathname, router, isAdmin]);
 
-  useEffect(() => {
-    if (!loading && !user) router.replace('/login');
-  }, [user, loading, router]);
-
-  if (loading) return <LoadingState />;
-  if (!user) return null;
+  if (dataLoading) return <LoadingState />;
 
   const hideNav = pathname === '/workout';
 
@@ -115,5 +108,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </Box>
       {!hideNav && <BottomNav />}
     </Box>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) router.replace('/login');
+  }, [user, loading, router]);
+
+  if (loading) return <LoadingState />;
+  if (!user) return null;
+
+  return (
+    <AppDataProvider>
+      <AppLayoutInner>{children}</AppLayoutInner>
+    </AppDataProvider>
   );
 }

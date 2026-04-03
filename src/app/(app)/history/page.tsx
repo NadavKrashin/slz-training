@@ -6,8 +6,8 @@ import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletions } from '@/hooks/useCompletions';
-import { useStreak } from '@/hooks/useStreak';
 import { useAllTimeStats } from '@/hooks/useAllTimeStats';
+import { useAppData } from '@/contexts/AppDataContext';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import { getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { NAV_HEIGHT } from '@/lib/constants';
@@ -18,7 +18,7 @@ export default function HistoryPage() {
   const month = currentMonth.getMonth();
   const { start, end } = getMonthRange(year, month);
   const { completions, loading } = useCompletions(start, end);
-  const { currentStreak } = useStreak();
+  const { currentStreak } = useAppData();
   const { totalCompleted, totalPosted } = useAllTimeStats();
   const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
 

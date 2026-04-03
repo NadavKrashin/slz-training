@@ -15,6 +15,7 @@ const NAV_PATHS = ['/home', '/history', '/timer', '/profile'];
 const NAV_PATHS_ADMIN = ['/home', '/history', '/timer', '/profile', '/admin'];
 const SWIPE_MIN_X = 60;   // minimum horizontal distance to count as a swipe
 const SWIPE_EDGE_GUARD = 30; // ignore swipes starting within this many px of screen edge
+const STALE_RELOAD_MS = 30 * 60 * 1000; // reload after 30 min in background
 
 declare global {
   interface Window {
@@ -46,6 +47,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const hiddenAt = useRef<number | null>(null);
+
+  // Reload the page if it has been in the background for a while so iOS PWA
+  // always picks up the latest deployed code.
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAt.current = Date.now();
+      } else if (
+        document.visibilityState === 'visible' &&
+        hiddenAt.current !== null &&
+        Date.now() - hiddenAt.current > STALE_RELOAD_MS
+      ) {
+        window.location.reload();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const x = e.touches[0].clientX;

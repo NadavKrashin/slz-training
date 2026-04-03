@@ -68,6 +68,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  // Force-refresh auth token when the app comes back to the foreground so
+  // that admin claims (and any other custom claims) are always up to date
+  // without requiring the user to sign out and back in.
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && auth.currentUser) {
+        auth.currentUser
+          .getIdTokenResult(/* forceRefresh */ true)
+          .then((tokenResult) => {
+            setIsAdmin(tokenResult.claims.admin === true);
+          })
+          .catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   const refreshClaims = async () => {
     if (auth.currentUser) {
       const tokenResult = await auth.currentUser.getIdTokenResult(true);

@@ -56,9 +56,9 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title || 'של\u05f4ז בכושר';
+  const title = payload.data?.title || 'של\u05f4ז בכושר';
   const options = {
-    body: payload.notification?.body || '',
+    body: payload.data?.body || '',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-96x96.png',
     dir: 'rtl',

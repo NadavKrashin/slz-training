@@ -85,8 +85,7 @@ export const sendCustomPush = onCall(async (request) => {
   const tokens = userTokens.map((u) => u.token);
   const message: admin.messaging.MulticastMessage = {
     tokens,
-    notification: { title: title.trim(), body: body.trim() },
-    webpush: { fcmOptions: { link: '/home' } },
+    data: { title: title.trim(), body: body.trim(), link: '/home' },
   };
 
   const response = await admin.messaging().sendEachForMulticast(message);

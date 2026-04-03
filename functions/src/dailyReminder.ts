@@ -77,11 +77,11 @@ export const sendDailyReminder = onSchedule(
 
     const message: admin.messaging.MulticastMessage = {
       tokens,
-      notification: {
+      data: {
         title: 'של״ז בכושר 💪',
         body: 'לא לשכוח את האימון היומי! נשארו עוד שעתיים.',
+        link: '/home',
       },
-      webpush: { fcmOptions: { link: '/home' } },
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);

@@ -14,16 +14,20 @@ import {
   Container,
   ThemeIcon,
   Alert,
+  Tooltip,
+  ActionIcon,
 } from '@mantine/core';
-import { IconUser, IconAlertCircle } from '@tabler/icons-react';
+import { IconUser, IconAlertCircle, IconInfoCircle } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/hooks/useUser';
 import { useStreak } from '@/hooks/useStreak';
+import { useUserLeaderboard } from '@/hooks/useUserLeaderboard';
 import { requestNotificationPermission } from '@/lib/firebase/messaging';
 import { hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
+import { UserLeaderboard } from '@/components/profile/UserLeaderboard';
 
 export default function ProfilePage() {
   const {
@@ -37,6 +41,11 @@ export default function ProfilePage() {
   } = useAuth();
   const { userData, updateProfile } = useUser();
   const { currentStreak } = useStreak();
+  const isSharing = userData?.shareCompletionWithAdmin ?? false;
+  // Only fetch leaderboard once we know the user is sharing (userData loaded + sharing on)
+  const { entries: leaderboardEntries, loading: leaderboardLoading } = useUserLeaderboard(
+    userData !== null && isSharing
+  );
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
@@ -270,10 +279,41 @@ export default function ProfilePage() {
 
               <Card>
                 <Switch
-                  label="שתף ביצוע אימונים עם המנהל"
-                  checked={userData?.shareCompletionWithAdmin ?? true}
+                  label={
+                    <Group gap={4} wrap="nowrap">
+                      <Text size="sm">שתף מידע</Text>
+                      <Tooltip
+                        label="הרצף הנוכחי שלך יוצג בלוח המצטיינים הגלוי לכל משתמשי האפליקציה. בנוסף, ביצועי האימונים שלך יהיו גלויים למנהל."
+                        multiline
+                        w={240}
+                        position="top"
+                        withArrow
+                      >
+                        <ActionIcon variant="subtle" size="xs" color="gray" component="span">
+                          <IconInfoCircle size={14} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
+                  }
+                  checked={isSharing}
                   onChange={handleToggleShare}
                 />
+              </Card>
+
+              <Card>
+                {isSharing ? (
+                  <UserLeaderboard
+                    entries={leaderboardEntries}
+                    loading={leaderboardLoading}
+                    currentUid={user?.uid ?? ''}
+                  />
+                ) : (
+                  <Stack gap={4} align="center">
+                    <Text size="sm" c="dimmed" ta="center">
+                      הפעל שיתוף מידע כדי להצטרף ללוח המצטיינים ולראות את הדירוג
+                    </Text>
+                  </Stack>
+                )}
               </Card>
 
               {hasNotificationAPI && notifPermission !== 'granted' && (

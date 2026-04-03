@@ -41,6 +41,8 @@ export function useStreak() {
         if (workoutDates.has(dk)) {
           if (completedSet.has(dk)) {
             streak++;
+          } else if (dk === today) {
+            // Today's workout not yet done — skip without breaking the streak
           } else {
             break;
           }

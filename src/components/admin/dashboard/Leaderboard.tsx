@@ -80,7 +80,7 @@ export function Leaderboard({ entries }: LeaderboardProps) {
                   </Text>
                 </Table.Td>
                 <Table.Td>
-                  <Text size="sm">{entry.streak > 0 ? `🔥 ${entry.streak}` : '—'}</Text>
+                  <Text size="sm">{entry.streak > 0 ? `🔥 ${entry.streak}` : '0'}</Text>
                 </Table.Td>
               </Table.Tr>
             ))}

@@ -100,6 +100,17 @@ export async function getAllUsers(): Promise<UserProfile[]> {
   return snap.docs.map((d) => ({ ...d.data(), uid: d.id }) as UserProfile);
 }
 
+export async function getSharingUsers(): Promise<UserProfile[]> {
+  const q = query(
+    collection(db, 'users'),
+    where('shareCompletionWithAdmin', '==', true)
+  );
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((d) => ({ ...d.data(), uid: d.id }) as UserProfile)
+    .filter((u) => u.role !== 'admin' && u.role !== 'guest');
+}
+
 export function subscribeToWorkout(
   dateKey: string,
   callback: (workout: Workout | null) => void

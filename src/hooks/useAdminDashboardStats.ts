@@ -35,7 +35,8 @@ export interface AdminDashboardStats {
 
 function computeStreak(
   completions: WorkoutCompletion[],
-  workoutDateKeys: Set<string>
+  workoutDateKeys: Set<string>,
+  today: string
 ): number {
   const completedSet = new Set(
     completions.filter((c) => c.completed).map((c) => c.dateKey)
@@ -47,6 +48,8 @@ function computeStreak(
     if (workoutDateKeys.has(dk)) {
       if (completedSet.has(dk)) {
         streak++;
+      } else if (dk === today) {
+        // Today's workout not yet done — skip without breaking the streak
       } else {
         break;
       }
@@ -109,7 +112,7 @@ export function useAdminDashboardStats(): AdminDashboardStats {
         const completed = comps.filter((c) => c.completed).length;
         const total = allWorkouts.length;
         const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-        const streak = computeStreak(comps, workoutDateKeys);
+        const streak = computeStreak(comps, workoutDateKeys, today);
         return { uid: u.uid, name: u.displayName, completed, total, percent, streak };
       });
 

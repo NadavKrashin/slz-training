@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Stack, Group, Button, Center, Box, Container } from '@mantine/core';
-import { IconPlayerPause, IconPlayerPlay, IconDoorExit } from '@tabler/icons-react';
+import { IconPlayerPause, IconPlayerPlay, IconDoorExit, IconPlayerSkipForward } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useWorkoutTimer } from '@/hooks/useWorkoutTimer';
 import { useStreak } from '@/hooks/useStreak';
@@ -111,6 +111,18 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
             >
               {timer.status === 'paused' ? 'המשך' : 'השהיה'}
             </Button>
+            {timer.currentStage?.type === 'rest' && (
+              <Button
+                size="lg"
+                radius="xl"
+                variant="light"
+                color="teal"
+                leftSection={<IconPlayerSkipForward size={20} />}
+                onClick={timer.skipStage}
+              >
+                דלג
+              </Button>
+            )}
             <Button
               size="lg"
               radius="xl"

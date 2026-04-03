@@ -157,6 +157,27 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
     onCompleteRef.current();
   }, [clearTimer]);
 
+  const skipStage = useCallback(() => {
+    const s = stateRef.current;
+    const allStages = stagesRef.current;
+    const nextIndex = s.currentStageIndex + 1;
+    if (nextIndex >= allStages.length) {
+      clearTimer();
+      dispatch({ type: 'COMPLETE' });
+      onCompleteRef.current();
+      return;
+    }
+    const t = now();
+    stageStartRef.current = t;
+    stageElapsedOnPauseRef.current = 0;
+    dispatch({
+      type: 'TICK',
+      stageRemaining: allStages[nextIndex].durationSeconds,
+      totalRemaining: s.totalRemaining,
+      nextStage: true,
+    });
+  }, [clearTimer]);
+
   useEffect(() => {
     return clearTimer;
   }, [clearTimer]);
@@ -164,5 +185,5 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
   const currentStage = stages[state.currentStageIndex] || null;
   const progress = stages.length > 0 ? (state.currentStageIndex / stages.length) * 100 : 0;
 
-  return { ...state, currentStage, progress, start, pause, resume, forceComplete };
+  return { ...state, currentStage, progress, start, pause, resume, forceComplete, skipStage };
 }

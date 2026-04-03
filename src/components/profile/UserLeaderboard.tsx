@@ -40,8 +40,8 @@ export function UserLeaderboard({ entries, loading, currentUid }: UserLeaderboar
     <Stack gap="xs">
       <Text fw={600} size="sm">לוח מצטיינים 🏆</Text>
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
         <Table highlightOnHover>

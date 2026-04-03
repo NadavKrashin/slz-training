@@ -5,11 +5,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCompletionsForUser, getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
 
+// Module-level cache — persists across page navigations within a session.
+const _cache = new Map<string, { currentStreak: number; totalCompletions: number }>();
+
 export function useStreak() {
   const { user } = useAuth();
-  const [currentStreak, setCurrentStreak] = useState(0);
-  const [totalCompletions, setTotalCompletions] = useState(0);
-  const [loading, setLoading] = useState(true);
+
+  const cached = user ? _cache.get(user.uid) : undefined;
+  const [currentStreak, setCurrentStreak] = useState(cached?.currentStreak ?? 0);
+  const [totalCompletions, setTotalCompletions] = useState(cached?.totalCompletions ?? 0);
+  const [loading, setLoading] = useState(!cached);
 
   useEffect(() => {
     if (!user) {
@@ -32,7 +37,7 @@ export function useStreak() {
 
       const completedSet = new Set(completions.filter((c) => c.completed).map((c) => c.dateKey));
       const workoutDates = new Set(workouts.map((w) => w.dateKey));
-      setTotalCompletions(completedSet.size);
+      const totalCompleted = completedSet.size;
 
       let streak = 0;
       const cursor = new Date();
@@ -49,9 +54,13 @@ export function useStreak() {
         }
         cursor.setDate(cursor.getDate() - 1);
       }
+
+      _cache.set(user!.uid, { currentStreak: streak, totalCompletions: totalCompleted });
       setCurrentStreak(streak);
+      setTotalCompletions(totalCompleted);
       setLoading(false);
     }
+
     calculate();
   }, [user]);
 

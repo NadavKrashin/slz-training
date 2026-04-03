@@ -21,16 +21,19 @@ function WorkoutsListPage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const loadWorkouts = async () => {
-    const today = new Date();
-    const start = new Date(today);
-    start.setDate(start.getDate() - 7);
-    const end = new Date(today);
-    end.setDate(end.getDate() + 30);
-    const startKey = formatDateKey(start);
-    const endKey = formatDateKey(end);
-    const w = await getWorkoutsInRange(startKey, endKey);
-    setWorkouts(w);
-    setLoading(false);
+    try {
+      const today = new Date();
+      const start = new Date(today);
+      start.setDate(start.getDate() - 7);
+      const end = new Date(today);
+      end.setDate(end.getDate() + 30);
+      const startKey = formatDateKey(start);
+      const endKey = formatDateKey(end);
+      const w = await getWorkoutsInRange(startKey, endKey);
+      setWorkouts(w);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

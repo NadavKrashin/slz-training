@@ -177,7 +177,7 @@ export function useAdminDashboardStats(): AdminDashboardStats {
       });
     }
 
-    load();
+    load().catch(() => setStats((s) => ({ ...s, loading: false })));
   }, []);
 
   return stats;

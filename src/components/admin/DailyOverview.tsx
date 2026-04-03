@@ -33,7 +33,7 @@ export function DailyOverview() {
       setCompletedUids(uidsCompleted);
       setLoading(false);
     }
-    load();
+    load().catch(() => setLoading(false));
   }, [dateKey]);
 
   if (loading) return <Text c="dimmed">טוען...</Text>;

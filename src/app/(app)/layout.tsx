@@ -70,8 +70,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const currentIndex = paths.findIndex((p) => pathname.startsWith(p));
     if (currentIndex === -1) return;
 
-    // Swipe left → next tab, swipe right → previous tab
-    const nextIndex = dx < 0 ? currentIndex + 1 : currentIndex - 1;
+    // Swipe right → next tab, swipe left → previous tab
+    const nextIndex = dx > 0 ? currentIndex + 1 : currentIndex - 1;
     if (nextIndex < 0 || nextIndex >= paths.length) return;
     router.push(paths[nextIndex]);
   }, [pathname, router, isAdmin]);

@@ -5,20 +5,20 @@ import { Box, UnstyledButton, Stack, Text, Group } from '@mantine/core';
 import {
   IconBarbell,
   IconUsers,
-  IconCalendarEvent,
   IconMessage,
   IconClock,
   IconLayoutDashboard,
   IconBarbellFilled,
+  IconHomeFilled,
 } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { NAV_HEIGHT } from '@/lib/constants';
 
 const ADMIN_ITEMS = [
+  { label: 'אפליקציה', icon: IconHomeFilled, iconActive: IconHomeFilled, path: '/home', exact: true },
   { label: 'ראשי', icon: IconLayoutDashboard, iconActive: IconLayoutDashboard, path: '/admin', exact: true },
   { label: 'אימונים', icon: IconBarbell, iconActive: IconBarbellFilled, path: '/admin/workouts' },
   { label: 'משתמשים', icon: IconUsers, iconActive: IconUsers, path: '/admin/users' },
-  { label: 'סקירה', icon: IconCalendarEvent, iconActive: IconCalendarEvent, path: '/admin/daily' },
   { label: 'הודעות', icon: IconMessage, iconActive: IconMessage, path: '/admin/messages' },
   { label: 'טיימר', icon: IconClock, iconActive: IconClock, path: '/admin/timer' },
 ];

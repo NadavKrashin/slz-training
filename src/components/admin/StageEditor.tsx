@@ -4,6 +4,7 @@ import {
   Stack,
   Group,
   TextInput,
+  Textarea,
   NumberInput,
   Select,
   ActionIcon,
@@ -63,63 +64,82 @@ export function StageEditor({ stages, onChange }: StageEditorProps) {
         </Alert>
       )}
       {stages.map((stage, index) => (
-        <Group key={stage.id} gap="xs" align="flex-end" wrap="wrap">
-          <Stack gap={2}>
+        <Stack key={stage.id} gap="xs">
+          <Group gap="xs" align="flex-end" wrap="wrap">
+            <Stack gap={2}>
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                aria-label="הזז למעלה"
+                onClick={() => moveStage(index, -1)}
+                disabled={index === 0}
+              >
+                <IconArrowUp size={14} />
+              </ActionIcon>
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                aria-label="הזז למטה"
+                onClick={() => moveStage(index, 1)}
+                disabled={index === stages.length - 1}
+              >
+                <IconArrowDown size={14} />
+              </ActionIcon>
+            </Stack>
+            <Text size="sm" c="dimmed" w={20} ta="center">
+              {index + 1}
+            </Text>
+            <TextInput
+              placeholder="שם השלב"
+              value={stage.name}
+              onChange={(e) => updateStage(index, { name: e.currentTarget.value })}
+              style={{ flex: 1, minWidth: 120 }}
+            />
+            <Select
+              data={[
+                { value: 'exercise', label: 'תרגיל' },
+                { value: 'rest', label: 'מנוחה' },
+              ]}
+              value={stage.type}
+              onChange={(v) => updateStage(index, { type: v as 'exercise' | 'rest' })}
+              w={100}
+            />
+            <NumberInput
+              placeholder="שניות"
+              value={stage.durationSeconds}
+              onChange={(v) => updateStage(index, { durationSeconds: Number(v) || 0 })}
+              min={1}
+              max={600}
+              w={80}
+              suffix=" ש׳"
+            />
             <ActionIcon
               variant="subtle"
-              size="sm"
-              aria-label="הזז למעלה"
-              onClick={() => moveStage(index, -1)}
-              disabled={index === 0}
+              color="red"
+              aria-label="מחק שלב"
+              onClick={() => removeStage(index)}
             >
-              <IconArrowUp size={14} />
+              <IconTrash size={16} />
             </ActionIcon>
-            <ActionIcon
-              variant="subtle"
-              size="sm"
-              aria-label="הזז למטה"
-              onClick={() => moveStage(index, 1)}
-              disabled={index === stages.length - 1}
-            >
-              <IconArrowDown size={14} />
-            </ActionIcon>
-          </Stack>
-          <Text size="sm" c="dimmed" w={20} ta="center">
-            {index + 1}
-          </Text>
-          <TextInput
-            placeholder="שם השלב"
-            value={stage.name}
-            onChange={(e) => updateStage(index, { name: e.currentTarget.value })}
-            style={{ flex: 1, minWidth: 120 }}
-          />
-          <Select
-            data={[
-              { value: 'exercise', label: 'תרגיל' },
-              { value: 'rest', label: 'מנוחה' },
-            ]}
-            value={stage.type}
-            onChange={(v) => updateStage(index, { type: v as 'exercise' | 'rest' })}
-            w={100}
-          />
-          <NumberInput
-            placeholder="שניות"
-            value={stage.durationSeconds}
-            onChange={(v) => updateStage(index, { durationSeconds: Number(v) || 0 })}
-            min={1}
-            max={600}
-            w={80}
-            suffix=" ש׳"
-          />
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            aria-label="מחק שלב"
-            onClick={() => removeStage(index)}
-          >
-            <IconTrash size={16} />
-          </ActionIcon>
-        </Group>
+          </Group>
+          {stage.type === 'exercise' && (
+            <Stack gap="xs" pl={48}>
+              <Textarea
+                placeholder="תיאור התרגיל (אופציונלי)"
+                value={stage.description ?? ''}
+                onChange={(e) => updateStage(index, { description: e.currentTarget.value || undefined })}
+                rows={2}
+                size="xs"
+              />
+              <TextInput
+                placeholder="קישור ל-GIF (אופציונלי)"
+                value={stage.gifUrl ?? ''}
+                onChange={(e) => updateStage(index, { gifUrl: e.currentTarget.value || undefined })}
+                size="xs"
+              />
+            </Stack>
+          )}
+        </Stack>
       ))}
       <Button variant="light" leftSection={<IconPlus size={16} />} onClick={addStage}>
         הוסף שלב

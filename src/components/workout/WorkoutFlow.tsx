@@ -60,7 +60,7 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
 
   return (
     <Box className="immersive-gradient">
-      {timer.status === 'paused' && <PauseOverlay onResume={timer.resume} />}
+      {timer.status === 'paused' && <PauseOverlay onResume={timer.resume} stage={timer.currentStage ?? undefined} />}
       <Container size="sm" px="md">
         <Stack gap="lg" py="xl">
           <ProgressBar

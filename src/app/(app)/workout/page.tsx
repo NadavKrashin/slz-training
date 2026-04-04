@@ -7,18 +7,20 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { useAppData } from '@/contexts/AppDataContext';
 
 export default function WorkoutPage() {
-  const { todayWorkout: workout, isCompleted, markComplete } = useAppData();
+  const { todayWorkout: workout, isCompleted, markComplete, loading } = useAppData();
   const router = useRouter();
 
   useEffect(() => {
+    if (loading) return;
     if (!workout) router.replace('/home');
-  }, [workout, router]);
+  }, [workout, router, loading]);
 
   useEffect(() => {
+    if (loading) return;
     if (isCompleted) router.replace('/home');
-  }, [isCompleted, router]);
+  }, [isCompleted, router, loading]);
 
-  if (!workout) return <LoadingState />;
+  if (loading || !workout) return <LoadingState />;
   if (isCompleted) return null;
 
   // onComplete only persists — navigation is owned by CompletionScreen

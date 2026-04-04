@@ -40,7 +40,7 @@ const AppDataContext = createContext<AppDataContextValue | null>(null);
 
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [dateKey, setDateKey] = useState(getTodayDateKey);
   const [userData, setUserData] = useState<UserProfile | null>(null);
@@ -81,6 +81,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   // User profile subscription
   useEffect(() => {
+    if (authLoading) return; // Auth not settled — keep loading=true until we know the user
     if (!user) {
       setLoading(false);
       return;
@@ -92,7 +93,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setUserData(d);
       markReady('user');
     });
-  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user, authLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Today's workout subscription
   useEffect(() => {

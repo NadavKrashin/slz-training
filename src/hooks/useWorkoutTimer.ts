@@ -2,7 +2,6 @@
 
 import { useReducer, useEffect, useRef, useCallback } from 'react';
 import type { WorkoutStage, WorkoutFlowStatus } from '@/lib/types';
-import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
 import { now } from '@/lib/clock';
 
 interface TimerState {
@@ -19,12 +18,12 @@ type TimerAction =
   | { type: 'RESUME' }
   | { type: 'COMPLETE' };
 
-function createInitialState(stages: WorkoutStage[]): TimerState {
+function createInitialState(stages: WorkoutStage[], totalDurationSeconds: number): TimerState {
   return {
     status: 'idle',
     currentStageIndex: 0,
     stageRemaining: stages.length > 0 ? stages[0].durationSeconds : 0,
-    totalRemaining: WORKOUT_DURATION_SECONDS,
+    totalRemaining: totalDurationSeconds,
   };
 }
 
@@ -50,8 +49,8 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
   }
 }
 
-export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) {
-  const [state, dispatch] = useReducer(timerReducer, stages, createInitialState);
+export function useWorkoutTimer(stages: WorkoutStage[], totalDurationSeconds: number, onComplete: () => void) {
+  const [state, dispatch] = useReducer(timerReducer, null, () => createInitialState(stages, totalDurationSeconds));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef(0);
   const totalElapsedOnPauseRef = useRef(0);
@@ -79,7 +78,7 @@ export function useWorkoutTimer(stages: WorkoutStage[], onComplete: () => void) 
       const allStages = stagesRef.current;
       const totalElapsed = totalElapsedOnPauseRef.current + (t - startTimeRef.current) / 1000;
       const stageElapsed = stageElapsedOnPauseRef.current + (t - stageStartRef.current) / 1000;
-      const totalRemaining = Math.max(0, WORKOUT_DURATION_SECONDS - totalElapsed);
+      const totalRemaining = Math.max(0, totalDurationSeconds - totalElapsed);
 
       if (totalRemaining <= 0) {
         clearTimer();

@@ -14,7 +14,6 @@ import {
 } from '@mantine/core';
 import { IconTrash, IconPlus, IconArrowUp, IconArrowDown } from '@tabler/icons-react';
 import { nanoid } from 'nanoid';
-import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
 import type { WorkoutStage } from '@/lib/types';
 
 interface StageEditorProps {
@@ -24,7 +23,6 @@ interface StageEditorProps {
 
 export function StageEditor({ stages, onChange }: StageEditorProps) {
   const totalDuration = stages.reduce((sum, s) => sum + s.durationSeconds, 0);
-  const isValid = totalDuration === WORKOUT_DURATION_SECONDS;
 
   const addStage = () => {
     onChange([
@@ -53,16 +51,10 @@ export function StageEditor({ stages, onChange }: StageEditorProps) {
     <Stack gap="md">
       <Group justify="space-between" align="center">
         <Text fw={600}>שלבים</Text>
-        <Text fw={700} size="sm" c={isValid ? 'green' : 'red'}>
-          {totalDuration} / {WORKOUT_DURATION_SECONDS} שניות
+        <Text fw={700} size="sm" c="dimmed">
+          {totalDuration} שניות ({Math.floor(totalDuration / 60)}:{String(totalDuration % 60).padStart(2, '0')})
         </Text>
       </Group>
-      {!isValid && totalDuration > 0 && (
-        <Alert color="red" variant="light">
-          סך כל זמן השלבים חייב להיות בדיוק {WORKOUT_DURATION_SECONDS} שניות (
-          {WORKOUT_DURATION_SECONDS / 60} דקות)
-        </Alert>
-      )}
       {stages.map((stage, index) => (
         <Stack key={stage.id} gap="xs">
           <Group gap="xs" align="flex-end" wrap="wrap">

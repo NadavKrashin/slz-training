@@ -6,7 +6,6 @@ import { IconPlayerPause, IconPlayerPlay, IconDoorExit, IconPlayerSkipForward } 
 import { useRouter } from 'next/navigation';
 import { useWorkoutTimer } from '@/hooks/useWorkoutTimer';
 import { useAppData } from '@/contexts/AppDataContext';
-import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
 import type { Workout } from '@/lib/types';
 import { TimerDisplay } from './TimerDisplay';
 import { StageDisplay } from './StageDisplay';
@@ -29,7 +28,7 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
   const handleComplete = useCallback(() => {
     onComplete();
   }, [onComplete]);
-  const timer = useWorkoutTimer(workout.stages, handleComplete);
+  const timer = useWorkoutTimer(workout.stages, workout.totalDurationSeconds, handleComplete);
 
   if (timer.status === 'completed') return <CompletionScreen streak={currentStreak} />;
 
@@ -111,7 +110,7 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
             />
             <TimerDisplay
               remaining={timer.totalRemaining}
-              total={WORKOUT_DURATION_SECONDS}
+              total={workout.totalDurationSeconds}
               label="זמן כולל"
               color="white"
               size="sm"

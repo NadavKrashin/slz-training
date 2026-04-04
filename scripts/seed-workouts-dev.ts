@@ -164,9 +164,9 @@ const WORKOUTS: WorkoutTemplate[] = [
   },
 ];
 
-function getDateKey(daysAgo: number): string {
+function getDateKey(daysPast: number): string {
   const d = new Date();
-  d.setDate(d.getDate() - daysAgo);
+  d.setDate(d.getDate() + daysPast);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');

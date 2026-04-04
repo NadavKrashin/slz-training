@@ -9,6 +9,7 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { NAV_HEIGHT } from '@/lib/constants';
+import { preloadCriticalPoses } from '@/lib/sealz/preload';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 
@@ -51,7 +52,8 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const touchStartY = useRef<number | null>(null);
   const hiddenAt = useRef<number | null>(null);
 
-  // Reload after 30 min in background so iOS PWA always picks up latest code.
+  useEffect(() => { preloadCriticalPoses(); }, []);
+
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {

@@ -3,6 +3,8 @@
 import { Overlay, Center, Stack, Button, Text, ScrollArea } from '@mantine/core';
 import { IconPlayerPlay } from '@tabler/icons-react';
 import type { WorkoutStage } from '@/lib/types';
+import { Sealz } from '@/components/ui/Sealz';
+import { getSealzMessage } from '@/lib/sealz/messages';
 
 interface PauseOverlayProps {
   onResume: () => void;
@@ -21,6 +23,8 @@ export function PauseOverlay({ onResume, stage }: PauseOverlayProps) {
             <Text size="2rem" fw={700} c="white">
               האימון בהשהיה
             </Text>
+
+            <Sealz pose="waiting" size="md" message={getSealzMessage('pause')} />
 
             {(hasDescription || hasGif) && (
               <Stack align="center" gap="md" w="100%">

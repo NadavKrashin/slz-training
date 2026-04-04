@@ -1,15 +1,29 @@
 'use client';
 
 import { Stack, Text, Box, Container } from '@mantine/core';
-import { IconBarbell } from '@tabler/icons-react';
 import { WorkoutCard } from '@/components/home/WorkoutCard';
 import { StreakBadge } from '@/components/home/StreakBadge';
-import { Mascot } from '@/components/home/Mascot';
+import { Sealz } from '@/components/ui/Sealz';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { useAppData } from '@/contexts/AppDataContext';
+import { selectPose } from '@/lib/sealz/poseSelector';
+import { getHomeMessage } from '@/lib/sealz/messages';
 
 export default function HomePage() {
   const { userData, todayWorkout, isCompleted, currentStreak, motivationalMessage } = useAppData();
+
+  const pose = selectPose({
+    screen: 'home',
+    isCompleted,
+    hasWorkoutToday: !!todayWorkout,
+  });
+
+  const message = getHomeMessage(
+    isCompleted,
+    !!todayWorkout,
+    undefined,
+    motivationalMessage,
+  );
 
   return (
     <Box pb={NAV_HEIGHT + 24}>
@@ -25,9 +39,21 @@ export default function HomePage() {
         <Container size="sm">
           <Stack gap="md">
             <Text size="lg" fw={700} c="white" ta="center">
-              שלום, {userData?.displayName || 'חבר/ה'} 👋
+              שלום, {userData?.displayName || 'חבר/ה'}
             </Text>
-            <Mascot isCompleted={isCompleted} message={motivationalMessage} />
+            <Box
+              style={{
+                height: 80,
+                overflow: 'visible',
+                position: 'relative',
+                zIndex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Sealz pose={pose} size="lg" message={message} />
+            </Box>
             <StreakBadge streak={currentStreak} />
           </Stack>
         </Container>
@@ -38,20 +64,13 @@ export default function HomePage() {
           {todayWorkout ? (
             <WorkoutCard workout={todayWorkout} isCompleted={isCompleted} />
           ) : (
-            <Box
-              p="xl"
-              ta="center"
-              style={{
-                borderRadius: 'var(--mantine-radius-lg)',
-                background: 'var(--mantine-color-gray-0)',
-              }}
-            >
-              <Stack align="center" gap="xs">
-                <IconBarbell size={32} color="var(--mantine-color-gray-4)" stroke={1.5} />
-                <Text c="dimmed" fw={500}>
-                  אין אימון מוגדר להיום
-                </Text>
-              </Stack>
+            <Box p="xl" ta="center" style={{ overflow: 'visible' }}>
+              <Sealz
+                pose="resting"
+                size="lg"
+                message="אין אימון מוגדר להיום"
+                bubbleVariant="light"
+              />
             </Box>
           )}
         </Stack>

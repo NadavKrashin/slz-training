@@ -27,6 +27,8 @@ import { hasNotificationAPI, getNotificationPermission } from '@/lib/browser';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { UserLeaderboard } from '@/components/profile/UserLeaderboard';
+import { Sealz } from '@/components/ui/Sealz';
+import { selectPose } from '@/lib/sealz/poseSelector';
 
 export default function ProfilePage() {
   const {
@@ -190,11 +192,17 @@ export default function ProfilePage() {
 
       <Container size="sm" px="md" pt="lg">
         <Stack gap="md">
-          <Card>
+          <Card py="xl" style={{ overflow: 'visible', position: 'relative' }}>
+            <Box style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 1, pointerEvents: 'none' }}>
+              <Sealz
+                pose={selectPose({ screen: 'profile', currentStreak })}
+                size="md"
+              />
+            </Box>
             <Group justify="center" gap="xs">
               <Text size="sm">רצף אימונים:</Text>
               <Text size="lg" fw={700} c="orange.6">
-                🔥 {currentStreak} ימים
+                {currentStreak} ימים
               </Text>
             </Group>
           </Card>

@@ -14,6 +14,8 @@ import { ProgressBar } from './ProgressBar';
 import { PauseOverlay } from './PauseOverlay';
 import { CompletionScreen } from './CompletionScreen';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { SealzStacked } from '../ui/Sealz';
+import { getSealzMessage } from '@/lib/sealz/messages';
 
 interface WorkoutFlowProps {
   workout: Workout;
@@ -36,6 +38,11 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
       <Box className="immersive-gradient">
         <Center mih="100dvh">
           <Stack align="center" gap="xl">
+            <SealzStacked
+              pose="ready"
+              size="lg"
+              message={getSealzMessage('preWorkout')}
+            />
             <StageDisplay
               stage={workout.stages[0]}
               stageNumber={1}

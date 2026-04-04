@@ -53,7 +53,7 @@ export function useUserLeaderboard(enabled = true) {
       setLoading(false);
     }
 
-    load();
+    load().catch(() => setLoading(false));
   }, [enabled]);
 
   return { entries, loading };

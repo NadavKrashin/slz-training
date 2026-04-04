@@ -140,10 +140,11 @@ export function useAdminDashboardStats(): AdminDashboardStats {
             ) / 10
           : 0;
 
-      // Weekly trend
+      // Weekly trend — only count sharing users to keep numerator/denominator consistent
+      const sharingUidSet = new Set(sharingUsers.map((u) => u.uid));
       const completedByDay = new Map<string, Set<string>>();
       for (const c of recentCompletions) {
-        if (last7.includes(c.dateKey)) {
+        if (last7.includes(c.dateKey) && sharingUidSet.has(c.uid)) {
           if (!completedByDay.has(c.dateKey)) completedByDay.set(c.dateKey, new Set());
           completedByDay.get(c.dateKey)!.add(c.uid);
         }

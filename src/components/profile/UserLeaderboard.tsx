@@ -17,7 +17,7 @@ export function UserLeaderboard({ entries, loading, currentUid }: UserLeaderboar
   if (loading) {
     return (
       <Stack gap="xs">
-        <Text fw={600} size="sm">לוח מצטיינים</Text>
+        <Text fw={600} size="sm">המובילים</Text>
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} height={36} radius="sm" />
         ))}
@@ -28,9 +28,9 @@ export function UserLeaderboard({ entries, loading, currentUid }: UserLeaderboar
   if (entries.length === 0) {
     return (
       <Stack gap="xs">
-        <Text fw={600} size="sm">לוח מצטיינים</Text>
+        <Text fw={600} size="sm">המובילים</Text>
         <Center>
-          <Text c="dimmed" size="sm">אין עדיין משתתפים בלוח המצטיינים</Text>
+          <Text c="dimmed" size="sm">אין עדיין משתתפים במובילים</Text>
         </Center>
       </Stack>
     );
@@ -38,7 +38,7 @@ export function UserLeaderboard({ entries, loading, currentUid }: UserLeaderboar
 
   return (
     <Stack gap="xs">
-      <Text fw={600} size="sm">לוח מצטיינים 🏆</Text>
+      <Text fw={600} size="sm">המובילים 🏆</Text>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

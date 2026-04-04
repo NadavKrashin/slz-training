@@ -280,7 +280,7 @@ export default function ProfilePage() {
                     <Group gap={4} wrap="nowrap">
                       <Text size="sm">שתף מידע</Text>
                       <Tooltip
-                        label="הרצף הנוכחי שלך יוצג בלוח המצטיינים הגלוי לכל משתמשי האפליקציה. בנוסף, ביצועי האימונים שלך יהיו גלויים למנהל."
+                        label="הרצף הנוכחי שלך יוצג במובילים הגלוי לכל משתמשי האפליקציה. בנוסף, ביצועי האימונים שלך יהיו גלויים למנהל."
                         multiline
                         w={240}
                         position="top"
@@ -307,7 +307,7 @@ export default function ProfilePage() {
                 ) : (
                   <Stack gap={4} align="center">
                     <Text size="sm" c="dimmed" ta="center">
-                      הפעל שיתוף מידע כדי להצטרף ללוח המצטיינים ולראות את הדירוג
+                      הפעל שיתוף מידע כדי להצטרף למובילים ולראות את הדירוג
                     </Text>
                   </Stack>
                 )}

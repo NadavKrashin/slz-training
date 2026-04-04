@@ -9,6 +9,7 @@ import {
 } from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
 import { calcStreak } from '@/lib/streak';
+import { MAX_STREAK_DAYS } from '@/lib/constants';
 
 export function useUserStatsForUid(uid: string) {
   const [totalCompleted, setTotalCompleted] = useState(0);
@@ -29,7 +30,7 @@ export function useUserStatsForUid(uid: string) {
       try {
         const today = getTodayDateKey();
         const lookback = new Date();
-        lookback.setDate(lookback.getDate() - 90);
+        lookback.setDate(lookback.getDate() - MAX_STREAK_DAYS);
         const start = formatDateKey(lookback);
 
         // Fetch 90-day range for streak + server-side counts for all-time stats — all in parallel

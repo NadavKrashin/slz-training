@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getSharingUsers, getWorkoutsInRange, getRecentCompletions } from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
 import { calcStreak } from '@/lib/streak';
+import { MAX_STREAK_DAYS } from '@/lib/constants';
 
 export interface UserLeaderboardEntry {
   uid: string;
@@ -24,7 +25,7 @@ export function useUserLeaderboard(enabled = true) {
     async function load() {
       const today = getTodayDateKey();
       const lookback = new Date();
-      lookback.setDate(lookback.getDate() - 90);
+      lookback.setDate(lookback.getDate() - MAX_STREAK_DAYS);
       const start = formatDateKey(lookback);
 
       const [sharingUsers, workouts, allCompletions] = await Promise.all([

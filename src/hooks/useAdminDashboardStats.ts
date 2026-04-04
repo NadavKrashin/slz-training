@@ -11,6 +11,7 @@ import {
 } from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
 import { calcStreak } from '@/lib/streak';
+import { MAX_STREAK_DAYS } from '@/lib/constants';
 import type { Workout, WorkoutCompletion, UserProfile } from '@/lib/types';
 
 export interface LeaderboardEntry {
@@ -64,7 +65,7 @@ export function useAdminDashboardStats(): AdminDashboardStats {
     async function load() {
       const today = getTodayDateKey();
       const lookback = new Date();
-      lookback.setDate(lookback.getDate() - 90);
+      lookback.setDate(lookback.getDate() - MAX_STREAK_DAYS);
       const start = formatDateKey(lookback);
 
       // Phase 1: fetch base data — bounded 90-day range for completions

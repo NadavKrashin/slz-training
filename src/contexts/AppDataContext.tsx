@@ -22,7 +22,7 @@ import {
 } from '@/lib/firebase/firestore';
 import { getTodayDateKey, getMsUntilMidnight, formatDateKey } from '@/lib/dates';
 import { calcStreak } from '@/lib/streak';
-import { MOTIVATIONAL_MESSAGES_SEED } from '@/lib/constants';
+import { MOTIVATIONAL_MESSAGES_SEED, MAX_STREAK_DAYS } from '@/lib/constants';
 import type { UserProfile, Workout, WorkoutCompletion } from '@/lib/types';
 
 export interface AppDataContextValue {
@@ -70,7 +70,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const today = getTodayDateKey();
     const lookback = new Date();
-    lookback.setDate(lookback.getDate() - 90);
+    lookback.setDate(lookback.getDate() - MAX_STREAK_DAYS);
     const start = formatDateKey(lookback);
     const [comps, workouts] = await Promise.all([
       getCompletionsForUser(user.uid, start, today),

@@ -1,5 +1,6 @@
 export const APP_TIMEZONE = 'Asia/Jerusalem';
 export const WORKOUT_DURATION_SECONDS = 600;
+export const MAX_STREAK_DAYS = 365;
 export const HEBREW_DAYS_SHORT = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
 export const NAV_HEIGHT = 64;
 

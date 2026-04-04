@@ -1,4 +1,5 @@
 import { formatDateKey } from './dates';
+import { MAX_STREAK_DAYS } from './constants';
 import type { WorkoutCompletion } from './types';
 
 export function calcStreak(
@@ -11,7 +12,7 @@ export function calcStreak(
   );
   let streak = 0;
   const cursor = new Date();
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < MAX_STREAK_DAYS; i++) {
     const dk = formatDateKey(cursor);
     if (workoutDateKeys.has(dk)) {
       if (completedSet.has(dk)) {

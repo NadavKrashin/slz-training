@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Box } from '@mantine/core';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppDataProvider, useAppData } from '@/contexts/AppDataContext';
+import { useAppData } from '@/contexts/AppDataContext';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageTransition } from '@/components/ui/PageTransition';
@@ -124,9 +124,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (loading) return <LoadingState />;
   if (!user) return null;
 
-  return (
-    <AppDataProvider>
-      <AppLayoutInner>{children}</AppLayoutInner>
-    </AppDataProvider>
-  );
+  return <AppLayoutInner>{children}</AppLayoutInner>;
 }

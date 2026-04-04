@@ -8,6 +8,7 @@ import { Notifications } from '@mantine/notifications';
 import { Heebo } from 'next/font/google';
 import { theme } from '@/theme/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { AppDataProvider } from '@/contexts/AppDataContext';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { DevToolbarWrapper } from '@/components/dev/DevToolbarWrapper';
@@ -53,11 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MantineProvider theme={theme} defaultColorScheme="light">
             <Notifications position="top-center" />
             <AuthProvider>
-              <ErrorBoundary>
-                <OfflineBanner />
-                {children}
-                <DevToolbarWrapper />
-              </ErrorBoundary>
+              <AppDataProvider>
+                <ErrorBoundary>
+                  <OfflineBanner />
+                  {children}
+                  <DevToolbarWrapper />
+                </ErrorBoundary>
+              </AppDataProvider>
             </AuthProvider>
           </MantineProvider>
         </DirectionProvider>

@@ -20,27 +20,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   if (user) return null;
 
   return (
-    <Box style={{ position: 'relative', minHeight: '100dvh', overflow: 'hidden' }}>
-      <Box
-        style={{
-          position: 'absolute',
-          top: 24,
-          left: 0,
-          right: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-        }}
-      >
-        <Sealz pose="waving" size="lg" />
-      </Box>
-      <Center mih="100dvh" p="md" style={{ position: 'relative', zIndex: 1 }}>
-        <Container size="xs" w="100%">
+    <Center mih="100dvh" p="md">
+      <Container size="xs" w="100%">
+        <Stack gap="sm" align="center">
+          <Sealz pose="waving" size="lg" />
           <PageTransition>
             <Stack gap="xl">{children}</Stack>
           </PageTransition>
-        </Container>
-      </Center>
-    </Box>
+        </Stack>
+      </Container>
+    </Center>
   );
 }

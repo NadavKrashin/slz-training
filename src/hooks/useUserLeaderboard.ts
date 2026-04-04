@@ -12,9 +12,11 @@ export interface UserLeaderboardEntry {
   streak: number;
 }
 
+let leaderboardCache: UserLeaderboardEntry[] | null = null;
+
 export function useUserLeaderboard(enabled = true) {
-  const [entries, setEntries] = useState<UserLeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [entries, setEntries] = useState<UserLeaderboardEntry[]>(leaderboardCache ?? []);
+  const [loading, setLoading] = useState(enabled && !leaderboardCache);
 
   useEffect(() => {
     if (!enabled) {
@@ -49,6 +51,7 @@ export function useUserLeaderboard(enabled = true) {
       }));
 
       result.sort((a, b) => b.streak - a.streak);
+      leaderboardCache = result;
       setEntries(result);
       setLoading(false);
     }

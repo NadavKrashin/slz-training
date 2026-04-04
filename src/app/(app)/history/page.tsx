@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Stack, Text, Box, Container, Skeleton } from '@mantine/core';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
@@ -12,6 +12,8 @@ import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates'
 import { getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { NAV_HEIGHT } from '@/lib/constants';
 
+const workoutDatesCache = new Map<string, Set<string>>();
+
 export default function HistoryPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const year = currentMonth.getFullYear();
@@ -20,13 +22,16 @@ export default function HistoryPage() {
   const { completions, loading } = useCompletions(start, end);
   const { currentStreak } = useAppData();
   const { totalCompleted, totalPosted } = useAllTimeStats();
-  const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
+  const rangeKey = `${start}:${end}`;
+  const [workoutDates, setWorkoutDates] = useState<Set<string>>(workoutDatesCache.get(rangeKey) ?? new Set());
 
   useEffect(() => {
     getWorkoutsInRange(start, end).then((ws) => {
-      setWorkoutDates(new Set(ws.map((w) => w.dateKey)));
+      const set = new Set(ws.map((w) => w.dateKey));
+      workoutDatesCache.set(rangeKey, set);
+      setWorkoutDates(set);
     });
-  }, [start, end]);
+  }, [start, end, rangeKey]);
 
   const todayKey = getTodayDateKey();
   const canGoNext = `${year}-${String(month + 2).padStart(2, '0')}` <= todayKey.slice(0, 7);

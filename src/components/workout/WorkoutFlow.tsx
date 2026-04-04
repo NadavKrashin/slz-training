@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Stack, Group, Button, Center, Box, Container } from '@mantine/core';
+import { Stack, Group, Button, Center, Box, Container, Text } from '@mantine/core';
 import { IconPlayerPause, IconPlayerPlay, IconDoorExit, IconPlayerSkipForward } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useWorkoutTimer } from '@/hooks/useWorkoutTimer';
@@ -75,6 +75,23 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
               totalStages={workout.stages.length}
               inverted
             />
+          )}
+          {timer.currentStage?.type === 'exercise' && (timer.currentStage.description || timer.currentStage.gifUrl) && (
+            <Stack align="center" gap="sm">
+              {timer.currentStage.gifUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={timer.currentStage.gifUrl}
+                  alt={timer.currentStage.name}
+                  style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 12, objectFit: 'contain' }}
+                />
+              )}
+              {timer.currentStage.description && (
+                <Text size="sm" c="rgba(255,255,255,0.75)" ta="center" style={{ whiteSpace: 'pre-wrap' }}>
+                  {timer.currentStage.description}
+                </Text>
+              )}
+            </Stack>
           )}
           <Group justify="center" gap="xl" py="lg">
             <TimerDisplay

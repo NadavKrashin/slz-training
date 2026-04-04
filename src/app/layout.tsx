@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   title: 'של״ז בכושר',
   description: 'אפליקציית אימון יומי של 10 דקות',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -36,9 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="he" dir="rtl">
       <head>
         <ColorSchemeScript />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>

@@ -11,9 +11,8 @@ import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletionsForUid } from '@/hooks/useCompletions';
-import { useAllTimeStatsForUid } from '@/hooks/useAllTimeStatsForUid';
-import { useStreakForUid } from '@/hooks/useStreakForUid';
-import { useUser } from '@/hooks/useUser';
+import { useUserStatsForUid } from '@/hooks/useUserStatsForUid';
+import { useAuth } from '@/contexts/AuthContext';
 import { subscribeToUser, getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { setAdminClaimFn, removeAdminClaimFn } from '@/lib/firebase/functions';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
@@ -26,7 +25,7 @@ function UserDetailInner() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(false);
-  const { userData: currentUser } = useUser();
+  const { user: currentUser } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -39,8 +38,7 @@ function UserDetailInner() {
     start,
     end
   );
-  const { totalCompleted, totalPosted } = useAllTimeStatsForUid(sharesData ? uid : '');
-  const { currentStreak } = useStreakForUid(sharesData ? uid : '');
+  const { totalCompleted, totalPosted, currentStreak } = useUserStatsForUid(sharesData ? uid : '');
   const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
 
   useEffect(() => {

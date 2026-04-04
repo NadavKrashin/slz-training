@@ -51,7 +51,11 @@ export default function AdminDashboard() {
         <Leaderboard entries={stats.leaderboard} />
 
         <Divider label="סקירה יומית" />
-        <DailyOverview />
+        <DailyOverview
+          users={stats.allUsers}
+          workout={stats.todayWorkout}
+          completedUids={stats.todayCompletedUids}
+        />
       </Stack>
     </PageContainer>
   );

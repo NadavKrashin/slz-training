@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getAllWorkoutsUpTo, getAllCompletionsForUser } from '@/lib/firebase/firestore';
+import { getWorkoutCount, getCompletionCountForUser } from '@/lib/firebase/firestore';
 import { getTodayDateKey } from '@/lib/dates';
 
 export function useAllTimeStats() {
@@ -20,14 +20,17 @@ export function useAllTimeStats() {
     }
 
     async function calculate() {
-      const today = getTodayDateKey();
-      const [completions, workouts] = await Promise.all([
-        getAllCompletionsForUser(user!.uid, today),
-        getAllWorkoutsUpTo(today),
-      ]);
-      setTotalCompleted(completions.filter((c) => c.completed).length);
-      setTotalPosted(workouts.length);
-      setLoading(false);
+      try {
+        const today = getTodayDateKey();
+        const [completedCount, workoutCount] = await Promise.all([
+          getCompletionCountForUser(user!.uid, today),
+          getWorkoutCount(today),
+        ]);
+        setTotalCompleted(completedCount);
+        setTotalPosted(workoutCount);
+      } finally {
+        setLoading(false);
+      }
     }
 
     calculate();

@@ -5,7 +5,7 @@ import { Stack, Group, Button, Center, Box, Container } from '@mantine/core';
 import { IconPlayerPause, IconPlayerPlay, IconDoorExit, IconPlayerSkipForward } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useWorkoutTimer } from '@/hooks/useWorkoutTimer';
-import { useStreak } from '@/hooks/useStreak';
+import { useAppData } from '@/contexts/AppDataContext';
 import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
 import type { Workout } from '@/lib/types';
 import { TimerDisplay } from './TimerDisplay';
@@ -23,7 +23,7 @@ interface WorkoutFlowProps {
 export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
   const router = useRouter();
   const [showExitModal, setShowExitModal] = useState(false);
-  const { currentStreak } = useStreak();
+  const { currentStreak } = useAppData();
   const handleComplete = useCallback(() => {
     onComplete();
   }, [onComplete]);

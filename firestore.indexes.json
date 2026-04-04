@@ -23,6 +23,14 @@
         { "fieldPath": "dateKey", "order": "ASCENDING" },
         { "fieldPath": "completed", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "notificationLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "sentAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

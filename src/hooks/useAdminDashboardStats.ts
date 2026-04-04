@@ -1,9 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAllUsers, getAllWorkoutsUpTo, getAllCompletionsUpTo, getWorkout } from '@/lib/firebase/firestore';
+import {
+  getAllUsers,
+  getWorkoutsInRange,
+  getWorkoutCount,
+  getWorkout,
+  getRecentCompletions,
+  getCompletionCountForUser,
+} from '@/lib/firebase/firestore';
 import { getTodayDateKey, formatDateKey } from '@/lib/dates';
-import type { Workout, WorkoutCompletion } from '@/lib/types';
+import { calcStreak } from '@/lib/streak';
+import type { Workout, WorkoutCompletion, UserProfile } from '@/lib/types';
 
 export interface LeaderboardEntry {
   uid: string;
@@ -23,40 +31,16 @@ export interface DayTrend {
 
 export interface AdminDashboardStats {
   loading: boolean;
+  allUsers: UserProfile[];
   sharingCount: number;
   totalEligibleCount: number;
   todayWorkout: Workout | null;
   todayCompletedCount: number;
+  todayCompletedUids: Set<string>;
   allTimeCompletionPercent: number;
   averageStreak: number;
   leaderboard: LeaderboardEntry[];
   weeklyTrend: DayTrend[];
-}
-
-function computeStreak(
-  completions: WorkoutCompletion[],
-  workoutDateKeys: Set<string>,
-  today: string
-): number {
-  const completedSet = new Set(
-    completions.filter((c) => c.completed).map((c) => c.dateKey)
-  );
-  let streak = 0;
-  const cursor = new Date();
-  for (let i = 0; i < 90; i++) {
-    const dk = formatDateKey(cursor);
-    if (workoutDateKeys.has(dk)) {
-      if (completedSet.has(dk)) {
-        streak++;
-      } else if (dk === today) {
-        // Today's workout not yet done — skip without breaking the streak
-      } else {
-        break;
-      }
-    }
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
 }
 
 const HEBREW_DAYS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
@@ -64,10 +48,12 @@ const HEBREW_DAYS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
 export function useAdminDashboardStats(): AdminDashboardStats {
   const [stats, setStats] = useState<AdminDashboardStats>({
     loading: true,
+    allUsers: [],
     sharingCount: 0,
     totalEligibleCount: 0,
     todayWorkout: null,
     todayCompletedCount: 0,
+    todayCompletedUids: new Set(),
     allTimeCompletionPercent: 0,
     averageStreak: 0,
     leaderboard: [],
@@ -77,13 +63,19 @@ export function useAdminDashboardStats(): AdminDashboardStats {
   useEffect(() => {
     async function load() {
       const today = getTodayDateKey();
+      const lookback = new Date();
+      lookback.setDate(lookback.getDate() - 90);
+      const start = formatDateKey(lookback);
 
-      const [allUsers, allWorkouts, todayWorkout, allCompletions] = await Promise.all([
-        getAllUsers(),
-        getAllWorkoutsUpTo(today),
-        getWorkout(today),
-        getAllCompletionsUpTo(today),
-      ]);
+      // Phase 1: fetch base data — bounded 90-day range for completions
+      const [allUsers, recentWorkouts, todayWorkout, recentCompletions, totalWorkoutCount] =
+        await Promise.all([
+          getAllUsers(),
+          getWorkoutsInRange(start, today),
+          getWorkout(today),
+          getRecentCompletions(start, today),
+          getWorkoutCount(today),
+        ]);
 
       const sharingUsers = allUsers.filter(
         (u) => u.shareCompletionWithAdmin && u.role !== 'admin' && u.role !== 'guest'
@@ -92,7 +84,7 @@ export function useAdminDashboardStats(): AdminDashboardStats {
         (u) => u.role !== 'admin' && u.role !== 'guest'
       ).length;
 
-      const workoutDateKeys = new Set(allWorkouts.map((w) => w.dateKey));
+      const workoutDateKeys = new Set(recentWorkouts.map((w) => w.dateKey));
 
       // Build last-7-days date keys (including today)
       const last7: string[] = [];
@@ -102,37 +94,40 @@ export function useAdminDashboardStats(): AdminDashboardStats {
         cursor7.setDate(cursor7.getDate() - 1);
       }
 
-      // Group completions by uid
-      const completionsByUid = new Map<string, typeof allCompletions>();
-      for (const c of allCompletions) {
+      // Group recent completions by uid
+      const completionsByUid = new Map<string, WorkoutCompletion[]>();
+      for (const c of recentCompletions) {
         if (!completionsByUid.has(c.uid)) completionsByUid.set(c.uid, []);
         completionsByUid.get(c.uid)!.push(c);
       }
-      const completionsByUser = sharingUsers.map((u) => completionsByUid.get(u.uid) ?? []);
 
-      // Build per-user stats
+      // Phase 2: all-time per-user completed counts (server-side, no doc transfer)
+      const allTimeCountsByUser = await Promise.all(
+        sharingUsers.map((u) => getCompletionCountForUser(u.uid, today))
+      );
+
+      // Today's completion state
+      const todayCompletedUids = new Set(
+        recentCompletions
+          .filter((c) => c.dateKey === today)
+          .map((c) => c.uid)
+      );
+      const todayCompletedCount = sharingUsers.filter((u) => todayCompletedUids.has(u.uid)).length;
+
+      // Leaderboard
       const leaderboard: LeaderboardEntry[] = sharingUsers.map((u, i) => {
-        const comps = completionsByUser[i];
-        const completed = comps.filter((c) => c.completed).length;
-        const total = allWorkouts.length;
+        const completed = allTimeCountsByUser[i];
+        const total = totalWorkoutCount;
         const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-        const streak = computeStreak(comps, workoutDateKeys, today);
+        const streak = calcStreak(completionsByUid.get(u.uid) ?? [], workoutDateKeys, today);
         return { uid: u.uid, name: u.displayName, completed, total, percent, streak };
       });
 
       leaderboard.sort((a, b) => b.percent - a.percent || b.completed - a.completed);
 
-      // Today's completion count
-      const todayCompletedCount = completionsByUser.filter((comps) =>
-        comps.some((c) => c.dateKey === today && c.completed)
-      ).length;
-
-      // All-time completion %: total completed across all users / (total workouts * sharing users)
-      const totalPossible = allWorkouts.length * sharingUsers.length;
-      const totalCompleted = completionsByUser.reduce(
-        (sum, comps) => sum + comps.filter((c) => c.completed).length,
-        0
-      );
+      // All-time completion % across all sharing users
+      const totalCompleted = allTimeCountsByUser.reduce((sum, n) => sum + n, 0);
+      const totalPossible = totalWorkoutCount * sharingUsers.length;
       const allTimeCompletionPercent =
         totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
 
@@ -145,14 +140,11 @@ export function useAdminDashboardStats(): AdminDashboardStats {
           : 0;
 
       // Weekly trend
-      // Build a map: dateKey -> Set of uids who completed
       const completedByDay = new Map<string, Set<string>>();
-      for (const comps of completionsByUser) {
-        for (const c of comps) {
-          if (c.completed && last7.includes(c.dateKey)) {
-            if (!completedByDay.has(c.dateKey)) completedByDay.set(c.dateKey, new Set());
-            completedByDay.get(c.dateKey)!.add(c.uid);
-          }
+      for (const c of recentCompletions) {
+        if (last7.includes(c.dateKey)) {
+          if (!completedByDay.has(c.dateKey)) completedByDay.set(c.dateKey, new Set());
+          completedByDay.get(c.dateKey)!.add(c.uid);
         }
       }
 
@@ -170,10 +162,12 @@ export function useAdminDashboardStats(): AdminDashboardStats {
 
       setStats({
         loading: false,
+        allUsers,
         sharingCount: sharingUsers.length,
         totalEligibleCount: totalEligible,
         todayWorkout,
         todayCompletedCount,
+        todayCompletedUids,
         allTimeCompletionPercent,
         averageStreak: avgStreak,
         leaderboard,

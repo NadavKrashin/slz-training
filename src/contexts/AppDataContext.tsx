@@ -16,10 +16,12 @@ import {
   subscribeToCompletion,
   getCompletionsForUser,
   getWorkoutsInRange,
+  markWorkoutComplete,
   updateUser,
   getActiveMessages,
 } from '@/lib/firebase/firestore';
 import { getTodayDateKey, getMsUntilMidnight, formatDateKey } from '@/lib/dates';
+import { calcStreak } from '@/lib/streak';
 import { MOTIVATIONAL_MESSAGES_SEED } from '@/lib/constants';
 import type { UserProfile, Workout, WorkoutCompletion } from '@/lib/types';
 
@@ -31,28 +33,11 @@ export interface AppDataContextValue {
   motivationalMessage: string;
   loading: boolean;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+  markComplete: (workoutTitle: string) => Promise<void>;
 }
 
 const AppDataContext = createContext<AppDataContextValue | null>(null);
 
-function calcStreak(
-  completions: WorkoutCompletion[],
-  workoutDateKeys: Set<string>,
-  today: string
-): number {
-  const done = new Set(completions.filter((c) => c.completed).map((c) => c.dateKey));
-  let streak = 0;
-  const cur = new Date();
-  for (let i = 0; i < 90; i++) {
-    const dk = formatDateKey(cur);
-    if (workoutDateKeys.has(dk)) {
-      if (done.has(dk)) streak++;
-      else if (dk !== today) break;
-    }
-    cur.setDate(cur.getDate() - 1);
-  }
-  return streak;
-}
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -174,9 +159,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     [user]
   );
 
+  const markComplete = useCallback(
+    async (workoutTitle: string) => {
+      if (!user) return;
+      await markWorkoutComplete(user.uid, dateKey, workoutTitle);
+    },
+    [user, dateKey]
+  );
+
   return (
     <AppDataContext.Provider
-      value={{ userData, todayWorkout, isCompleted, currentStreak, motivationalMessage, loading, updateProfile }}
+      value={{ userData, todayWorkout, isCompleted, currentStreak, motivationalMessage, loading, updateProfile, markComplete }}
     >
       {children}
     </AppDataContext.Provider>

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import type { SealzPose, SealzSize } from '@/lib/sealz/types';
 import { SEALZ_SIZE_MAP } from '@/lib/sealz/types';
 import { getPoseAssetPath } from '@/lib/sealz/poses';
-import { SealzBubble } from './SealzBubble';
+import { SealzBubble, type TailDirection } from './SealzBubble';
 
 interface SealzProps {
   pose: SealzPose;
@@ -14,6 +14,7 @@ interface SealzProps {
   showBubble?: boolean;
   animated?: boolean;
   bubbleVariant?: 'glass' | 'light';
+  tailDirection?: TailDirection;
 }
 
 const entranceTransition = {
@@ -102,6 +103,7 @@ export function Sealz({
   showBubble,
   animated = false,
   bubbleVariant = 'glass',
+  tailDirection = 'right',
 }: SealzProps) {
   const { width, height } = SEALZ_SIZE_MAP[size];
   const shouldShowBubble = showBubble ?? !!message;
@@ -112,7 +114,7 @@ export function Sealz({
         <SealzImage pose={pose} w={width} h={height} animated={animated} />
       </div>
       {shouldShowBubble && message && (
-        <SealzBubble message={message} variant={bubbleVariant} />
+        <SealzBubble message={message} variant={bubbleVariant} tailDirection={tailDirection} />
       )}
     </Group>
   );
@@ -125,6 +127,7 @@ export function SealzStacked({
   showBubble,
   animated = false,
   bubbleVariant = 'glass',
+  tailDirection = 'top',
 }: SealzProps) {
   const { width, height } = SEALZ_SIZE_MAP[size];
   const shouldShowBubble = showBubble ?? !!message;
@@ -133,7 +136,7 @@ export function SealzStacked({
     <Stack align="center" gap="sm">
       <SealzImage pose={pose} w={width} h={height} animated={animated} />
       {shouldShowBubble && message && (
-        <SealzBubble message={message} variant={bubbleVariant} />
+        <SealzBubble message={message} variant={bubbleVariant} tailDirection={tailDirection} />
       )}
     </Stack>
   );

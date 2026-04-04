@@ -4,6 +4,7 @@ import { Stack, Text, Box, Container } from '@mantine/core';
 import { WorkoutCard } from '@/components/home/WorkoutCard';
 import { StreakBadge } from '@/components/home/StreakBadge';
 import { Sealz } from '@/components/ui/Sealz';
+import { SealzBubble } from '@/components/ui/SealzBubble';
 import { NAV_HEIGHT } from '@/lib/constants';
 import { useAppData } from '@/contexts/AppDataContext';
 import { selectPose } from '@/lib/sealz/poseSelector';
@@ -31,29 +32,30 @@ export default function HomePage() {
         style={{
           background: 'linear-gradient(160deg, #4c6ef5 0%, #5c7cfa 50%, #748ffc 100%)',
           borderRadius: '0 0 24px 24px',
+          position: 'relative',
+          overflow: 'hidden',
         }}
         px="md"
         pt={36}
         pb={28}
       >
+        {/* Sealz pinned to the left side (visual right in RTL) */}
+        <Box
+          style={{
+            position: 'absolute',
+            left: 8,
+            bottom: 0,
+            pointerEvents: 'none',
+          }}
+        >
+          <Sealz pose={pose} size="lg" />
+        </Box>
         <Container size="sm">
-          <Stack gap="md">
+          <Stack gap="md" style={{ position: 'relative', zIndex: 1 }}>
             <Text size="lg" fw={700} c="white" ta="center">
               שלום, {userData?.displayName || 'חבר/ה'}
             </Text>
-            <Box
-              style={{
-                height: 80,
-                overflow: 'visible',
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Sealz pose={pose} size="lg" message={message} />
-            </Box>
+            <SealzBubble message={message} tailDirection="left" />
             <StreakBadge streak={currentStreak} />
           </Stack>
         </Container>
@@ -64,10 +66,10 @@ export default function HomePage() {
           {todayWorkout ? (
             <WorkoutCard workout={todayWorkout} isCompleted={isCompleted} />
           ) : (
-            <Box p="xl" ta="center" style={{ overflow: 'visible' }}>
+            <Box p="xl" ta="center">
               <Sealz
                 pose="resting"
-                size="lg"
+                size="md"
                 message="אין אימון מוגדר להיום"
                 bubbleVariant="light"
               />

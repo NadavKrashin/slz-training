@@ -46,8 +46,12 @@ export async function resetPassword(email: string) {
 export async function signOut() {
   const user = auth.currentUser;
   if (user?.isAnonymous) {
-    await deleteGuestAccountFn({});
-    // Auth account is deleted server-side; sign out the client session
+    try {
+      await deleteGuestAccountFn({});
+    } catch (err) {
+      // If the function fails, still sign out the client session
+      console.error('deleteGuestAccount function failed:', err);
+    }
     return firebaseSignOut(auth);
   }
   return firebaseSignOut(auth);

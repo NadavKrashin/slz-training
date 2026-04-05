@@ -84,6 +84,16 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+// Always fetch HTML navigation requests from the network so the installed PWA
+// never serves a stale app shell that references outdated JS chunk hashes.
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/index.html'))
+    );
+  }
+});
 `;
 
 const outPath = path.join(__dirname, '..', 'public', 'firebase-messaging-sw.js');

@@ -1,22 +1,26 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Box, Group, UnstyledButton, Text, ScrollArea } from '@mantine/core';
+import { Box, UnstyledButton, Stack, Text, Group } from '@mantine/core';
 import {
   IconBarbell,
   IconUsers,
-  IconCalendarEvent,
   IconMessage,
   IconClock,
-  IconChevronRight,
+  IconLayoutDashboard,
+  IconBarbellFilled,
+  IconHomeFilled,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { NAV_HEIGHT } from '@/lib/constants';
 
 const ADMIN_ITEMS = [
-  { label: 'אימונים', icon: IconBarbell, path: '/admin/workouts' },
-  { label: 'משתמשים', icon: IconUsers, path: '/admin/users' },
-  { label: 'סקירה יומית', icon: IconCalendarEvent, path: '/admin/daily' },
-  { label: 'הודעות', icon: IconMessage, path: '/admin/messages' },
-  { label: 'טיימר', icon: IconClock, path: '/admin/timer' },
+  { label: 'אפליקציה', icon: IconHomeFilled, iconActive: IconHomeFilled, path: '/home', exact: true },
+  { label: 'ראשי', icon: IconLayoutDashboard, iconActive: IconLayoutDashboard, path: '/admin', exact: true },
+  { label: 'אימונים', icon: IconBarbell, iconActive: IconBarbellFilled, path: '/admin/workouts' },
+  { label: 'משתמשים', icon: IconUsers, iconActive: IconUsers, path: '/admin/users' },
+  { label: 'הודעות', icon: IconMessage, iconActive: IconMessage, path: '/admin/messages' },
+  { label: 'טיימר', icon: IconClock, iconActive: IconClock, path: '/admin/timer' },
 ];
 
 export function AdminNav() {
@@ -26,54 +30,58 @@ export function AdminNav() {
   return (
     <Box
       style={{
-        borderRadius: 0,
-        position: 'sticky',
-        top: 0,
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 100,
-        background: 'linear-gradient(135deg, #4c6ef5 0%, #5c7cfa 100%)',
-        boxShadow: '0 2px 12px rgba(76, 110, 245, 0.2)',
+        background: 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderTop: '1px solid var(--mantine-color-gray-2)',
       }}
     >
-      <ScrollArea type="never">
-        <Group gap={0} wrap="nowrap" px="xs" h={50}>
-          <UnstyledButton onClick={() => router.push('/home')} px="sm">
-            <Group gap={4}>
-              <IconChevronRight size={16} color="white" />
-              <Text size="sm" fw={600} c="white">
-                חזרה
-              </Text>
-            </Group>
-          </UnstyledButton>
-          {ADMIN_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.path);
-            return (
+      <Group justify="space-around" h={NAV_HEIGHT} px="xs">
+        {ADMIN_ITEMS.map((item) => {
+          const isActive = item.exact ? pathname === item.path : pathname.startsWith(item.path);
+          const Icon = isActive ? item.iconActive : item.icon;
+          return (
+            <motion.div key={item.path} whileTap={{ scale: 0.92 }} style={{ flex: 1 }}>
               <UnstyledButton
-                key={item.path}
                 onClick={() => router.push(item.path)}
-                px="sm"
-                py={6}
-                style={{
-                  borderRadius: 'var(--mantine-radius-xl)',
-                  background: isActive ? 'rgba(255,255,255,0.2)' : 'transparent',
-                  transition: 'background 0.2s ease',
-                }}
+                style={{ width: '100%' }}
               >
-                <Group gap={6} wrap="nowrap">
-                  <item.icon size={18} color="white" />
-                  <Text
-                    size="sm"
-                    fw={isActive ? 700 : 400}
-                    c="white"
-                    style={{ whiteSpace: 'nowrap' }}
-                  >
+                <Stack align="center" gap={2} pos="relative">
+                  {isActive && (
+                    <motion.div
+                      layoutId="admin-nav-indicator"
+                      style={{
+                        position: 'absolute',
+                        top: -10,
+                        width: 20,
+                        height: 3,
+                        borderRadius: 2,
+                        background: 'var(--mantine-color-brand-6)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <Icon
+                    size={24}
+                    color={
+                      isActive ? 'var(--mantine-color-brand-6)' : 'var(--mantine-color-gray-5)'
+                    }
+                    stroke={1.5}
+                  />
+                  <Text size="10px" fw={isActive ? 700 : 400} c={isActive ? 'brand.7' : 'gray.5'}>
                     {item.label}
                   </Text>
-                </Group>
+                </Stack>
               </UnstyledButton>
-            );
-          })}
-        </Group>
-      </ScrollArea>
+            </motion.div>
+          );
+        })}
+      </Group>
     </Box>
   );
 }

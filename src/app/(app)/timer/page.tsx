@@ -1,8 +1,8 @@
 'use client';
 
 import { Stack, Text, Box, Center } from '@mantine/core';
-import { IconClock } from '@tabler/icons-react';
 import { CountdownTimer } from '@/components/timer/CountdownTimer';
+import { Sealz, SealzStacked } from '@/components/ui/Sealz';
 import { useSportDayTimer } from '@/hooks/useSportDayTimer';
 import { NAV_HEIGHT } from '@/lib/constants';
 
@@ -20,19 +20,31 @@ export default function TimerPage() {
       <Center mih={`calc(100dvh - ${NAV_HEIGHT + 24}px)`}>
         <Stack gap="xl" align="center" px="md">
           <Stack align="center" gap={8}>
-            <IconClock size={28} color="rgba(255,255,255,0.7)" />
+            <Sealz pose={hasTarget ? 'focused' : 'shrugging'} size="lg" />
             <Text size="lg" fw={700} c="white">
               יום ספורט
             </Text>
           </Stack>
           {loading ? (
-            <Text c="rgba(255,255,255,0.7)">טוען...</Text>
+            <Box style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
+              <Box
+                style={{
+                  display: 'flex',
+                  borderRadius: 'var(--mantine-radius-xl)',
+                  background: 'rgba(255,255,255,0.1)',
+                  overflow: 'hidden',
+                  height: 100,
+                }}
+              />
+            </Box>
           ) : hasTarget ? (
             <CountdownTimer days={days} hours={hours} minutes={minutes} seconds={seconds} />
           ) : (
-            <Text c="rgba(255,255,255,0.6)" ta="center">
-              לא הוגדר תאריך ליום הספורט
-            </Text>
+            <SealzStacked
+              pose="shrugging"
+              size="lg"
+              message="לא הוגדר תאריך ליום הספורט"
+            />
           )}
         </Stack>
       </Center>

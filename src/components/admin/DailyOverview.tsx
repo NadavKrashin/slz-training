@@ -1,34 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Stack, Group, Text, Card, Badge, Table, ThemeIcon } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { getTodayDateKey, getHebrewDate } from '@/lib/dates';
-import { getCompletionsForDate, getAllUsers, getWorkout } from '@/lib/firebase/firestore';
-import type { WorkoutCompletion, UserProfile, Workout } from '@/lib/types';
+import { getHebrewDate } from '@/lib/dates';
+import type { UserProfile, Workout } from '@/lib/types';
 
-export function DailyOverview() {
-  const [dateKey] = useState(getTodayDateKey);
-  const [completions, setCompletions] = useState<WorkoutCompletion[]>([]);
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [workout, setWorkout] = useState<Workout | null>(null);
-  const [loading, setLoading] = useState(true);
+interface DailyOverviewProps {
+  users: UserProfile[];
+  workout: Workout | null;
+  completedUids: Set<string>;
+}
 
-  useEffect(() => {
-    Promise.all([getCompletionsForDate(dateKey), getAllUsers(), getWorkout(dateKey)]).then(
-      ([c, u, w]) => {
-        setCompletions(c);
-        setUsers(u);
-        setWorkout(w);
-        setLoading(false);
-      }
-    );
-  }, [dateKey]);
-
-  if (loading) return <Text c="dimmed">טוען...</Text>;
-
+export function DailyOverview({ users, workout, completedUids }: DailyOverviewProps) {
   const sharingUsers = users.filter((u) => u.shareCompletionWithAdmin && u.role !== 'admin');
-  const completedUids = new Set(completions.map((c) => c.uid));
   const completedCount = sharingUsers.filter((u) => completedUids.has(u.uid)).length;
 
   return (

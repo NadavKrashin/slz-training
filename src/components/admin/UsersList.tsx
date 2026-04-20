@@ -15,10 +15,9 @@ export function UsersList() {
   const router = useRouter();
 
   useEffect(() => {
-    getAllUsers().then((u) => {
-      setUsers(u);
-      setLoading(false);
-    });
+    getAllUsers()
+      .then((u) => setUsers(u))
+      .finally(() => setLoading(false));
   }, []);
 
   const guestCount = users.filter((u) => u.role === 'guest').length;

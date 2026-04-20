@@ -17,6 +17,8 @@ export interface WorkoutStage {
   type: 'exercise' | 'rest';
   durationSeconds: number;
   order: number;
+  description?: string;
+  gifUrl?: string;
 }
 
 export interface Workout {

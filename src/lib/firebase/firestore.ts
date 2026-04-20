@@ -13,6 +13,8 @@ import {
   Timestamp,
   serverTimestamp,
   Unsubscribe,
+  limit,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './config';
 import type {
@@ -97,6 +99,17 @@ export async function updateUser(uid: string, data: Partial<UserProfile>) {
 export async function getAllUsers(): Promise<UserProfile[]> {
   const snap = await getDocs(collection(db, 'users'));
   return snap.docs.map((d) => ({ ...d.data(), uid: d.id }) as UserProfile);
+}
+
+export async function getSharingUsers(): Promise<UserProfile[]> {
+  const q = query(
+    collection(db, 'users'),
+    where('shareCompletionWithAdmin', '==', true)
+  );
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((d) => ({ ...d.data(), uid: d.id }) as UserProfile)
+    .filter((u) => u.role !== 'admin' && u.role !== 'guest');
 }
 
 export function subscribeToWorkout(
@@ -210,6 +223,38 @@ export async function getCompletionsForUser(
   return snap.docs.map((d) => d.data() as WorkoutCompletion);
 }
 
+
+export async function getRecentCompletions(start: string, end: string): Promise<WorkoutCompletion[]> {
+  const q = query(
+    collection(db, 'workoutCompletions'),
+    where('dateKey', '>=', start),
+    where('dateKey', '<=', end),
+    where('completed', '==', true)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as WorkoutCompletion);
+}
+
+export async function getWorkoutCount(end: string): Promise<number> {
+  const q = query(
+    collection(db, 'workoutsByDate'),
+    where('dateKey', '<=', end)
+  );
+  const snap = await getCountFromServer(q);
+  return snap.data().count;
+}
+
+export async function getCompletionCountForUser(uid: string, end: string): Promise<number> {
+  const q = query(
+    collection(db, 'workoutCompletions'),
+    where('uid', '==', uid),
+    where('dateKey', '<=', end),
+    where('completed', '==', true)
+  );
+  const snap = await getCountFromServer(q);
+  return snap.data().count;
+}
+
 export async function getCompletionsForDate(dateKey: string): Promise<WorkoutCompletion[]> {
   const q = query(
     collection(db, 'workoutCompletions'),
@@ -265,3 +310,29 @@ export async function saveMessage(id: string | null, text: string, active: boole
 export async function deleteMessage(id: string) {
   return deleteDoc(doc(db, 'motivationalMessages', id));
 }
+
+export interface NotificationLog {
+  id: string;
+  type: 'manual' | 'scheduled';
+  title?: string;
+  body?: string;
+  audience?: 'all' | 'not_completed_today' | 'completed_today';
+  sentBy?: string;
+  sentAt: Timestamp;
+  targetedCount: number;
+  successCount: number;
+  failureCount: number;
+  staleTokensCleaned: number;
+}
+
+export async function getRecentManualNotificationLogs(count = 10): Promise<NotificationLog[]> {
+  const q = query(
+    collection(db, 'notificationLogs'),
+    where('type', '==', 'manual'),
+    orderBy('sentAt', 'desc'),
+    limit(count)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ ...d.data(), id: d.id }) as NotificationLog);
+}
+

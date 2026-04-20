@@ -1,8 +1,9 @@
 'use client';
 
-import { Center, Stack, Text, ThemeIcon, Box } from '@mantine/core';
-import { IconMoodSad } from '@tabler/icons-react';
+import { Center, Stack, Text, Box } from '@mantine/core';
 import { ReactNode } from 'react';
+import { SealzStacked } from './Sealz';
+import { getFirstMessage } from '@/lib/sealz/messages';
 
 interface EmptyStateProps {
   icon?: ReactNode;
@@ -22,9 +23,12 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
       >
         <Stack align="center" gap="md">
           {icon || (
-            <ThemeIcon size={60} radius="xl" variant="light" color="brand">
-              <IconMoodSad size={30} />
-            </ThemeIcon>
+            <SealzStacked
+              pose="shrugging"
+              size="lg"
+              message={getFirstMessage('empty')}
+              bubbleVariant="light"
+            />
           )}
           <Text size="lg" fw={600} ta="center" c="brand.8">
             {title}

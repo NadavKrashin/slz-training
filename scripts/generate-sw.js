@@ -56,9 +56,9 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title || 'של\u05f4ז בכושר';
+  const title = payload.data?.title || 'של\u05f4ז בכושר';
   const options = {
-    body: payload.notification?.body || '',
+    body: payload.data?.body || '',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-96x96.png',
     dir: 'rtl',
@@ -83,6 +83,16 @@ self.addEventListener('notificationclick', (event) => {
       if (clients.openWindow) return clients.openWindow(url);
     })
   );
+});
+
+// Always fetch HTML navigation requests from the network so the installed PWA
+// never serves a stale app shell that references outdated JS chunk hashes.
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/index.html'))
+    );
+  }
 });
 `;
 

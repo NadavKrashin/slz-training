@@ -12,3 +12,16 @@ export const brandBlue: MantineColorsTuple = [
   '#3b5bdb', // 8 — headers, gradient start
   '#364fc7', // 9 — darkest blue, gradient end
 ];
+
+export const warmOrange: MantineColorsTuple = [
+  '#fff4e6',
+  '#ffe8cc',
+  '#ffd8a8',
+  '#ffc078',
+  '#ffa94d',
+  '#ff922b',
+  '#fd7e14',
+  '#f76707',
+  '#e8590c',
+  '#d9480f',
+];

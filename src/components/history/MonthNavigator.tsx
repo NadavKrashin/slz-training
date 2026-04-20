@@ -17,9 +17,8 @@ export function MonthNavigator({ label, onPrev, onNext, canGoNext }: MonthNaviga
         variant="transparent"
         size="lg"
         onClick={onNext}
-        disabled={!canGoNext}
         c="white"
-        style={{ opacity: canGoNext ? 1 : 0.4 }}
+        style={{ visibility: canGoNext ? 'visible' : 'hidden' }}
       >
         <IconChevronRight size={20} />
       </ActionIcon>

@@ -1,15 +1,23 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Center, Stack, Text, Button, ThemeIcon, Box } from '@mantine/core';
-import { IconCheck, IconHome } from '@tabler/icons-react';
+import { Center, Stack, Text, Button, Box } from '@mantine/core';
+import { IconHome } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
+import { SealzStacked } from '@/components/ui/Sealz';
+import { selectPose, isMilestoneStreak } from '@/lib/sealz/poseSelector';
+import { getSealzMessage } from '@/lib/sealz/messages';
 
 export function CompletionScreen({ streak }: { streak: number }) {
   const newStreak = streak + 1;
   const router = useRouter();
   const confettiFired = useRef(false);
+
+  const pose = selectPose({ screen: 'workout-complete', currentStreak: streak });
+  const message = isMilestoneStreak(newStreak)
+    ? getSealzMessage('milestone', newStreak)
+    : getSealzMessage('celebration');
 
   useEffect(() => {
     if (confettiFired.current) return;
@@ -30,9 +38,7 @@ export function CompletionScreen({ streak }: { streak: number }) {
     >
       <Center mih="100dvh">
         <Stack align="center" gap="lg">
-          <ThemeIcon size={80} radius="xl" color="white" variant="filled" c="brand.6">
-            <IconCheck size={48} />
-          </ThemeIcon>
+          <SealzStacked pose={pose} size="xl" message={message} />
           <Text size="2rem" fw={700} ta="center" c="white">
             כל הכבוד!
           </Text>
@@ -50,11 +56,10 @@ export function CompletionScreen({ streak }: { streak: number }) {
               }}
             >
               <Text size="xl" fw={700} c="white" ta="center">
-                🔥 {newStreak} ימים רצוף!
+                {newStreak} ימים רצוף!
               </Text>
             </Box>
           )}
-          <Text style={{ fontSize: 64 }}>🎉</Text>
           <Button
             size="lg"
             color="white"

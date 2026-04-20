@@ -12,7 +12,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "emulators": "firebase emulators:start --project demo-slz-training --import=./emulator-data --export-on-exit=./emulator-data",
     "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 tsx scripts/seed-emulator.ts",
-    "seed:dev": "tsx scripts/seed-dev.ts",
+    "seed:dev-users": "tsx scripts/seed-dev.ts",
+    "seed:dev-workouts": "tsx scripts/seed-workouts-dev.ts",
     "emulators:export": "firebase emulators:export ./emulator-data"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.13",
     "firebase": "^11.2.0",
+    "framer-motion": "^12.38.0",
     "nanoid": "^5.0.9",
     "next": "^14.2.0",
     "react": "^18.3.0",

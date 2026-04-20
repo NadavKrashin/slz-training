@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Stack, Group, Button, Center, Box, Container } from '@mantine/core';
-import { IconPlayerPause, IconPlayerPlay, IconDoorExit } from '@tabler/icons-react';
+import { Stack, Group, Button, Center, Box, Container, Text } from '@mantine/core';
+import { IconPlayerPause, IconPlayerPlay, IconDoorExit, IconPlayerSkipForward } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useWorkoutTimer } from '@/hooks/useWorkoutTimer';
-import { useStreak } from '@/hooks/useStreak';
-import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
+import { useAppData } from '@/contexts/AppDataContext';
 import type { Workout } from '@/lib/types';
 import { TimerDisplay } from './TimerDisplay';
 import { StageDisplay } from './StageDisplay';
@@ -14,6 +13,9 @@ import { ProgressBar } from './ProgressBar';
 import { PauseOverlay } from './PauseOverlay';
 import { CompletionScreen } from './CompletionScreen';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { Sealz } from '../ui/Sealz';
+import { SealzBubble } from '../ui/SealzBubble';
+import { getSealzMessage } from '@/lib/sealz/messages';
 
 interface WorkoutFlowProps {
   workout: Workout;
@@ -23,19 +25,21 @@ interface WorkoutFlowProps {
 export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
   const router = useRouter();
   const [showExitModal, setShowExitModal] = useState(false);
-  const { currentStreak } = useStreak();
+  const { currentStreak } = useAppData();
   const handleComplete = useCallback(() => {
     onComplete();
   }, [onComplete]);
-  const timer = useWorkoutTimer(workout.stages, handleComplete);
+  const timer = useWorkoutTimer(workout.stages, workout.totalDurationSeconds, handleComplete);
 
   if (timer.status === 'completed') return <CompletionScreen streak={currentStreak} />;
 
   if (timer.status === 'idle') {
     return (
       <Box className="immersive-gradient">
-        <Center mih="100dvh">
-          <Stack align="center" gap="xl">
+        <Center mih="100dvh" style={{ position: 'relative', zIndex: 1, paddingBottom: '15dvh' }}>
+          <Stack align="center" gap="md">
+            <Sealz pose="ready" size="xl" />
+            <SealzBubble message={getSealzMessage('preWorkout')} tailDirection="top" />
             <StageDisplay
               stage={workout.stages[0]}
               stageNumber={1}
@@ -60,7 +64,7 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
 
   return (
     <Box className="immersive-gradient">
-      {timer.status === 'paused' && <PauseOverlay onResume={timer.resume} />}
+      {timer.status === 'paused' && <PauseOverlay onResume={timer.resume} stage={timer.currentStage ?? undefined} />}
       <Container size="sm" px="md">
         <Stack gap="lg" py="xl">
           <ProgressBar
@@ -76,6 +80,23 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
               inverted
             />
           )}
+          {timer.currentStage?.type === 'exercise' && (timer.currentStage.description || timer.currentStage.gifUrl) && (
+            <Stack align="center" gap="sm">
+              {timer.currentStage.gifUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={timer.currentStage.gifUrl}
+                  alt={timer.currentStage.name}
+                  style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 12, objectFit: 'contain' }}
+                />
+              )}
+              {timer.currentStage.description && (
+                <Text size="sm" c="rgba(255,255,255,0.75)" ta="center" style={{ whiteSpace: 'pre-wrap' }}>
+                  {timer.currentStage.description}
+                </Text>
+              )}
+            </Stack>
+          )}
           <Group justify="center" gap="xl" py="lg">
             <TimerDisplay
               remaining={timer.stageRemaining}
@@ -87,7 +108,7 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
             />
             <TimerDisplay
               remaining={timer.totalRemaining}
-              total={WORKOUT_DURATION_SECONDS}
+              total={workout.totalDurationSeconds}
               label="זמן כולל"
               color="white"
               size="sm"
@@ -111,6 +132,18 @@ export function WorkoutFlow({ workout, onComplete }: WorkoutFlowProps) {
             >
               {timer.status === 'paused' ? 'המשך' : 'השהיה'}
             </Button>
+            {timer.currentStage?.type === 'rest' && (
+              <Button
+                size="lg"
+                radius="xl"
+                variant="light"
+                color="teal"
+                leftSection={<IconPlayerSkipForward size={20} />}
+                onClick={timer.skipStage}
+              >
+                דלג
+              </Button>
+            )}
             <Button
               size="lg"
               radius="xl"

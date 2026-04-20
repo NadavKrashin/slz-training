@@ -103,11 +103,22 @@ function getDateKey(offsetDays: number): string {
   }).format(d);
 }
 
+async function upsertUser(params: { uid: string; email: string; password: string; displayName: string }) {
+  try {
+    return await auth.createUser(params);
+  } catch (err: any) {
+    if (err?.errorInfo?.code === 'auth/uid-already-exists') {
+      return auth.getUser(params.uid);
+    }
+    throw err;
+  }
+}
+
 async function seed() {
   console.log('Seeding Firebase emulators...\n');
 
-  // 1. Create users
-  const adminUser = await auth.createUser({
+  // 1. Create users (idempotent)
+  const adminUser = await upsertUser({
     uid: 'admin-user-1',
     email: 'admin@test.com',
     password: 'admin123',
@@ -115,7 +126,7 @@ async function seed() {
   });
   await auth.setCustomUserClaims(adminUser.uid, { admin: true });
 
-  const regularUser = await auth.createUser({
+  const regularUser = await upsertUser({
     uid: 'user-1',
     email: 'user@test.com',
     password: 'user1234',

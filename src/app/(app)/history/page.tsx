@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Stack, Text, Box, Container } from '@mantine/core';
+import { useState, useEffect, useRef } from 'react';
+import { Stack, Text, Box, Container, Skeleton } from '@mantine/core';
 import { CalendarGrid } from '@/components/history/CalendarGrid';
 import { MonthNavigator } from '@/components/history/MonthNavigator';
 import { MonthlySummary } from '@/components/history/MonthlySummary';
 import { useCompletions } from '@/hooks/useCompletions';
-import { useStreak } from '@/hooks/useStreak';
+import { useAllTimeStats } from '@/hooks/useAllTimeStats';
+import { useAppData } from '@/contexts/AppDataContext';
 import { getMonthRange, getHebrewMonthYear, getTodayDateKey } from '@/lib/dates';
 import { getWorkoutsInRange } from '@/lib/firebase/firestore';
 import { NAV_HEIGHT } from '@/lib/constants';
+
+const workoutDatesCache = new Map<string, Set<string>>();
 
 export default function HistoryPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -17,23 +20,24 @@ export default function HistoryPage() {
   const month = currentMonth.getMonth();
   const { start, end } = getMonthRange(year, month);
   const { completions, loading } = useCompletions(start, end);
-  const { currentStreak } = useStreak();
-  const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set());
+  const { currentStreak } = useAppData();
+  const { totalCompleted, totalPosted } = useAllTimeStats();
+  const rangeKey = `${start}:${end}`;
+  const [workoutDates, setWorkoutDates] = useState<Set<string>>(workoutDatesCache.get(rangeKey) ?? new Set());
 
   useEffect(() => {
     getWorkoutsInRange(start, end).then((ws) => {
-      setWorkoutDates(new Set(ws.map((w) => w.dateKey)));
+      const set = new Set(ws.map((w) => w.dateKey));
+      workoutDatesCache.set(rangeKey, set);
+      setWorkoutDates(set);
     });
-  }, [start, end]);
+  }, [start, end, rangeKey]);
 
   const todayKey = getTodayDateKey();
   const canGoNext = `${year}-${String(month + 2).padStart(2, '0')}` <= todayKey.slice(0, 7);
 
   const goNext = () => setCurrentMonth(new Date(year, month + 1, 1));
   const goPrev = () => setCurrentMonth(new Date(year, month - 1, 1));
-
-  const completed = Array.from(completions.values()).filter((c) => c.completed).length;
-  const total = workoutDates.size;
 
   return (
     <Box pb={NAV_HEIGHT + 24}>
@@ -65,9 +69,10 @@ export default function HistoryPage() {
       <Container size="sm" px="md" pt="lg">
         <Stack gap="lg">
           {loading ? (
-            <Text c="dimmed" ta="center">
-              טוען...
-            </Text>
+            <>
+              <Skeleton h={240} radius="lg" />
+              <Skeleton h={100} radius="lg" />
+            </>
           ) : (
             <>
               <CalendarGrid
@@ -77,9 +82,9 @@ export default function HistoryPage() {
                 workoutDates={workoutDates}
               />
               <MonthlySummary
-                completed={completed}
-                missed={total - completed}
-                total={total}
+                completed={totalCompleted}
+                missed={totalPosted - totalCompleted}
+                total={totalPosted}
                 streak={currentStreak}
               />
             </>

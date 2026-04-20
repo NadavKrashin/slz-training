@@ -68,6 +68,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  // Force-refresh auth token when the app comes back to the foreground so
+  // that admin claims (and any other custom claims) are always up to date
+  // without requiring the user to sign out and back in.
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && auth.currentUser) {
+        auth.currentUser
+          .getIdTokenResult(/* forceRefresh */ true)
+          .then((tokenResult) => {
+            setIsAdmin(tokenResult.claims.admin === true);
+          })
+          .catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   const refreshClaims = async () => {
     if (auth.currentUser) {
       const tokenResult = await auth.currentUser.getIdTokenResult(true);
@@ -93,10 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await signInAsGuest();
     },
     linkGuestToEmail: async (email, password, displayName) => {
-      await linkGuestToEmail(email, password, displayName);
+      const result = await linkGuestToEmail(email, password, displayName);
+      setUser(result.user);
+      setIsGuest(false);
     },
     linkGuestToGoogle: async () => {
-      await linkGuestToGoogle();
+      const result = await linkGuestToGoogle();
+      setUser(result.user);
+      setIsGuest(false);
     },
     resetPassword: async (email) => {
       await resetPassword(email);

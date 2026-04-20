@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Stack, TextInput, Textarea, Button, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { nanoid } from 'nanoid';
-import { WORKOUT_DURATION_SECONDS } from '@/lib/constants';
 import { saveWorkout, getWorkout } from '@/lib/firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { StageEditor } from './StageEditor';
@@ -43,7 +42,7 @@ export function WorkoutForm({ dateKey, onSaved, duplicateFrom }: WorkoutFormProp
   }, [dateKey, duplicateFrom]);
 
   const totalDuration = stages.reduce((sum, s) => sum + s.durationSeconds, 0);
-  const isValid = title.trim().length > 0 && totalDuration === WORKOUT_DURATION_SECONDS;
+  const isValid = title.trim().length > 0 && totalDuration > 0;
 
   const handleSubmit = async () => {
     if (!isValid || !user) return;

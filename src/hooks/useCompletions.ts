@@ -5,10 +5,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCompletionsForUser } from '@/lib/firebase/firestore';
 import type { WorkoutCompletion } from '@/lib/types';
 
+const completionsCache = new Map<string, Map<string, WorkoutCompletion>>();
+
 export function useCompletions(startDate: string, endDate: string) {
   const { user } = useAuth();
-  const [completions, setCompletions] = useState<Map<string, WorkoutCompletion>>(new Map());
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `${user?.uid ?? ''}:${startDate}:${endDate}`;
+  const cached = completionsCache.get(cacheKey);
+
+  const [completions, setCompletions] = useState<Map<string, WorkoutCompletion>>(cached ?? new Map());
+  const [loading, setLoading] = useState(!cached);
 
   useEffect(() => {
     if (!user) {
@@ -16,14 +21,14 @@ export function useCompletions(startDate: string, endDate: string) {
       setLoading(false);
       return;
     }
-    setLoading(true);
     getCompletionsForUser(user.uid, startDate, endDate).then((data) => {
       const map = new Map<string, WorkoutCompletion>();
       data.forEach((c) => map.set(c.dateKey, c));
+      completionsCache.set(cacheKey, map);
       setCompletions(map);
       setLoading(false);
     });
-  }, [user, startDate, endDate]);
+  }, [user, startDate, endDate, cacheKey]);
 
   return { completions, loading };
 }

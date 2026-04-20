@@ -6,7 +6,7 @@ import { LoginForm } from '@/components/auth/LoginForm';
 export default function LoginPage() {
   return (
     <Stack gap="lg">
-      <Stack gap={4} align="center">
+      <Stack gap="sm" align="center">
         <Text size="2rem" fw={700}>
           של״ז בכושר
         </Text>

@@ -1,40 +1,7 @@
 'use client';
 
-import { Stack, Text, Group, Box } from '@mantine/core';
-
-function TimeUnit({ value, label }: { value: number; label: string }) {
-  return (
-    <Stack align="center" gap={4}>
-      <Box
-        w={72}
-        h={80}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 'var(--mantine-radius-lg)',
-          background: 'rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        <Text size="2.5rem" fw={800} c="white" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {String(value).padStart(2, '0')}
-        </Text>
-      </Box>
-      <Text size="xs" fw={500} c="rgba(255,255,255,0.7)">
-        {label}
-      </Text>
-    </Stack>
-  );
-}
-
-function Separator() {
-  return (
-    <Text size="2rem" fw={700} c="rgba(255,255,255,0.5)" pt={8}>
-      :
-    </Text>
-  );
-}
+import { Text, Box } from '@mantine/core';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function CountdownTimer({
   days,
@@ -47,15 +14,67 @@ export function CountdownTimer({
   minutes: number;
   seconds: number;
 }) {
+  const units = [
+    { value: seconds, label: 'שניות' },
+    { value: minutes, label: 'דקות' },
+    { value: hours, label: 'שעות' },
+    { value: days, label: 'ימים' },
+  ];
+
   return (
-    <Group justify="center" gap="sm">
-      <TimeUnit value={days} label="ימים" />
-      <Separator />
-      <TimeUnit value={hours} label="שעות" />
-      <Separator />
-      <TimeUnit value={minutes} label="דקות" />
-      <Separator />
-      <TimeUnit value={seconds} label="שניות" />
-    </Group>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}
+    >
+      <Box
+        style={{
+          display: 'flex',
+          borderRadius: 'var(--mantine-radius-xl)',
+          background: 'rgba(255,255,255,0.12)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          overflow: 'hidden',
+        }}
+      >
+        {units.map((unit, i) => (
+          <Box
+            key={unit.label}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px 8px',
+              borderLeft: i < units.length - 1 ? '1px solid rgba(255,255,255,0.15)' : undefined,
+            }}
+          >
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={unit.value}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Text
+                  fw={800}
+                  c="white"
+                  style={{ fontVariantNumeric: 'tabular-nums', fontSize: '2rem', lineHeight: 1 }}
+                >
+                  {String(unit.value).padStart(2, '0')}
+                </Text>
+              </motion.div>
+            </AnimatePresence>
+            <Text size="xs" fw={500} c="rgba(255,255,255,0.7)" mt={4}>
+              {unit.label}
+            </Text>
+          </Box>
+        ))}
+      </Box>
+    </motion.div>
   );
 }

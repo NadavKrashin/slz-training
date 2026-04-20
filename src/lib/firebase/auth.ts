@@ -12,6 +12,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from './config';
+import { deleteGuestAccountFn } from './functions';
 import { createUserProfile, createGuestProfile, upsertUserProfile } from './firestore';
 
 const googleProvider = new GoogleAuthProvider();
@@ -43,6 +44,16 @@ export async function resetPassword(email: string) {
 }
 
 export async function signOut() {
+  const user = auth.currentUser;
+  if (user?.isAnonymous) {
+    try {
+      await deleteGuestAccountFn({});
+    } catch (err) {
+      // If the function fails, still sign out the client session
+      console.error('deleteGuestAccount function failed:', err);
+    }
+    return firebaseSignOut(auth);
+  }
   return firebaseSignOut(auth);
 }
 
@@ -62,7 +73,11 @@ export async function linkGuestToEmail(email: string, password: string, displayN
   const credential = EmailAuthProvider.credential(email, password);
   const result = await linkWithCredential(auth.currentUser, credential);
   await updateProfile(result.user, { displayName });
-  await upsertUserProfile(result.user.uid, { email, displayName });
+  try {
+    await upsertUserProfile(result.user.uid, { email, displayName });
+  } catch (err) {
+    console.error('upsertUserProfile failed after successful link:', err);
+  }
   return result;
 }
 
@@ -70,10 +85,14 @@ export async function linkGuestToGoogle() {
   if (!auth.currentUser) throw new Error('Not authenticated');
   const result = await linkWithPopup(auth.currentUser, googleProvider);
   const { uid, email, displayName, photoURL } = result.user;
-  await upsertUserProfile(uid, {
-    email: email ?? '',
-    displayName: displayName ?? '',
-    photoURL: photoURL ?? '',
-  });
+  try {
+    await upsertUserProfile(uid, {
+      email: email ?? '',
+      displayName: displayName ?? '',
+      photoURL: photoURL ?? '',
+    });
+  } catch (err) {
+    console.error('upsertUserProfile failed after successful link:', err);
+  }
   return result;
 }
